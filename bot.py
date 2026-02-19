@@ -39,6 +39,35 @@ MATCH_THRESHOLD = 0.8
 # Delay between actions (seconds)
 STEP_DELAY = 1.0
 
+# Walk path from spawn to Anya portal.
+# Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
+# before moving to the next waypoint. Tune per-step as needed.
+PORTAL_WALK_PATH = [
+    (747, 683, 1.58),
+    (735, 653, 1.31),
+    (717, 646, 1.23),
+    (698, 631, 0.92),
+    (833, 615, 0.74),
+    (845, 626, 0.67),
+    (864, 617, 0.92),
+    (898, 596, 0.80),
+    (804, 588, 0.87),
+    (764, 588, 0.68),
+    (749, 588, 0.65),
+    (757, 592, 0.66),
+    (816, 592, 0.60),
+    (949, 589, 0.67),
+    (870, 595, 0.58),
+    (790, 602, 0.60),
+    (733, 616, 0.62),
+    (729, 598, 0.55),
+    (728, 597, 0.56),
+    (728, 597, 0.55),
+    (723, 576, 1.52),
+    (736, 461, 1.82),
+    (589, 176, 3.0)
+]
+
 
 def capture_region(region: dict) -> np.ndarray:
     """Grab a screen region and return as a BGR numpy array."""
@@ -64,13 +93,30 @@ def wait_for_game_load():
         print("Run capture_template.py while in-game first.")
         sys.exit(1)
 
-    # Only scan around the known UI cross position (center ~846, 1066)
-    region = {"left": 821, "top": 1041, "width": 50, "height": 50}
+    # Scan the full bottom strip — template matching finds the cross wherever it is
+    region = {"left": 0, "top": 900, "width": 1680, "height": 200}
 
     print("Waiting for game to load (watching for UI cross)...")
     while not template_visible(template, region):
         time.sleep(0.5)
     print("Game loaded — UI detected, in town.")
+
+
+def walk_to_portal():
+    """Click through the waypoint path to reach the Anya portal."""
+    print(f"Walking to Anya portal ({len(PORTAL_WALK_PATH)} waypoints)...")
+    time.sleep(1)
+    for i, (x, y, delay) in enumerate(PORTAL_WALK_PATH, 1):
+        print(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
+        if i == len(PORTAL_WALK_PATH):
+            # Move first, pause so the game registers hover, then click in place
+            pyautogui.moveTo(x, y, duration=0.3)
+            time.sleep(0.3)
+            pyautogui.click()
+        else:
+            pyautogui.click(x, y)
+        time.sleep(delay)
+    print("Entered portal.")
 
 
 def main():
@@ -90,7 +136,9 @@ def main():
     # Wait until the loading screen finishes and we're standing in town
     wait_for_game_load()
 
-    print("Ready — next step: walk to the Anya portal.")
+    walk_to_portal()
+
+    print("Ready — next step: kill Pindleskin.")
 
 
 if __name__ == "__main__":

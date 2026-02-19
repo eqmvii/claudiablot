@@ -105,3 +105,87 @@ ok, that captured it. You should know that in Diablo 2 resurrected, the health g
 ## 2026-02-19 00:49:14 UTC
 
 commit this
+
+## 2026-02-19 00:51:45 UTC
+
+ok so it worked, let's go to the Anya portal next
+
+## 2026-02-19 00:59:03 UTC
+
+You're jumping the gun a little - after the game loads, the portal isn't on the screen. I'm going to do something different and give you the coordinates for a walk to the portal, after using the mouse coords script. We'll need to click these coordinates in succession, with let's say 1.5 seconds delay inbetween. I'll tweak that manually later: (626, 845) (416, 836) (908, 730) (409, 734) (644, 795) (826, 802) (397, 767) (443, 209)
+
+## 2026-02-19 01:00:46 UTC
+
+Hmm, gotta debug. Entered the game and the message "Waiting for game to load (watching for UI cross)..." displayed, but nothing happened after. So the template must not be matching. How do we think about debugging that?
+
+## 2026-02-19 01:02:54 UTC
+
+it had a match score of 0.259. Two previews opened and didn't look exactly aligned. Perhaps I have the window open in a slightly different location somehow?
+
+## 2026-02-19 01:05:01 UTC
+
+brilliant. It found it and got a 1.000
+
+## 2026-02-19 01:10:15 UTC
+
+waypoints aren't working well, even when I made the delay longer. Do you have a better idea for how to get us to the portal? It's several screens away.
+
+## 2026-02-19 01:12:13 UTC
+
+We're going to use waypoints, I just have to finesse them. Waldo is a Warlock, a new class, and even sorcs can't telport in town silly claude. What I need you to do is update the script so that each coordinate has a different delay time associated with it, rather than a uniform one. Then I can manually finesse it until we get in the portal. Do this!
+
+## 2026-02-19 01:14:45 UTC
+
+I have an idea actually. Make a script to let me RECORD the walk. When I start the script, wait for me to click the first waypoint, and from then on, record the exact mouse coord I clicked as well as the time until the next click. Write that output to a markdown file and then you can see it and fix bot.py! BOOM!
+
+## 2026-02-19 01:15:54 UTC
+
+pip is not recognized. gotta start with python or someting, fix the command up for me
+
+## 2026-02-19 01:17:19 UTC
+
+ok, I recorded it. So you should have the files - do your thing!
+
+## 2026-02-19 01:18:47 UTC
+
+didn't work - try adding an extra half second to each click delay and let's try again
+
+## 2026-02-19 01:20:59 UTC
+
+re-recorded the walk. Accidentally have a 9th click, please don't include that. Add an extra 0.25 seconds to each. re-write bot.py and let's try
+
+## 2026-02-19 01:23:02 UTC
+
+re-recorded. Add 1 second delay before the first one and 0.1 seconds between each walk. Update script.
+
+## 2026-02-19 01:25:06 UTC
+
+ok got VERY close to the portal. I need you to delete the last two waypoints. I will then give you a single, final waypoint that is the portal.
+
+## 2026-02-19 01:26:16 UTC
+
+674, 212
+
+## 2026-02-19 01:31:37 UTC
+
+it kinda looks like we click the portal but don't go in. Can we make that final press a slightly longer click?
+
+## 2026-02-19 01:34:13 UTC
+
+make it a click and hold
+
+## 2026-02-19 01:35:29 UTC
+
+It's missing again, weird. Delete the last waypoint and let me give you the coordinate again.
+
+## 2026-02-19 01:39:04 UTC
+
+delete the final click and hold shit too.
+
+## 2026-02-19 01:43:05 UTC
+
+pyautogui must be doing something kind of weird. Can we move the mouse there before the click or something at the final waypoint? I see the click happen after hovering over the portal, but the character kidn of runs past it, which is unexpected. The way it's clicking must be subtly different from the way I click when using the mouse and the game.
+
+## 2026-02-19 01:45:19 UTC
+
+you beautiful LLM that did it! We should probably have been moving the mouse before clicking the whole time, but chicken mcfuckit, this works. I'll do a lil more testing, you commit and push. Well done!
