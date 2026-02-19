@@ -174,7 +174,7 @@ def kill_pindleskin():
     pyautogui.press("alt")
 
 
-def loot_runes():
+def loot_runes(run_number: int):
     """Capture a loot screenshot, save it, and pick up any rune found."""
     pyautogui.moveTo(200, 200, duration=0.2)
     time.sleep(0.2)
@@ -200,8 +200,8 @@ def loot_runes():
     hits = find_runes(path)
 
     with open(RUN_LOG, "a") as f:
-        f.write(f"{timestamp}  runes_found={len(hits)}\n")
-    print(f"{timestamp}  runes_found={len(hits)}")
+        f.write(f"{timestamp}  run={run_number}  runes_found={len(hits)}\n")
+    print(f"{timestamp}  run={run_number}  runes_found={len(hits)}")
 
     if not hits:
         log("No rune found.")
@@ -274,19 +274,27 @@ def run_once(run_number: int):
 
     kill_pindleskin()
 
-    loot_runes()
+    loot_runes(run_number)
 
-    log("Waiting 5 seconds before next game...")
-    time.sleep(5)
+    log("Waiting before next game...")
+    time.sleep(2)
 
     exit_game()
+
+
+def _load_run_count() -> int:
+    try:
+        with open(RUN_LOG) as f:
+            return sum(1 for _ in f)
+    except FileNotFoundError:
+        return 0
 
 
 def main():
     log("Starting in 2 seconds — alt-tab to D2R now...")
     time.sleep(2)
 
-    run_number = 1
+    run_number = _load_run_count() + 1
     while True:
         run_once(run_number)
         run_number += 1

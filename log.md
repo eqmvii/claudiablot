@@ -405,3 +405,11 @@ let's git ignore the run log (@runs.log) and also please add a print statement o
 ## 2026-02-19 20:41:48 UTC
 
 Great. One last change - if the run found a rune, save it to a new folder. Make it a subfolder of @screens_from_runs/ called found_runes
+
+## 2026-02-19 20:45:00 UTC
+
+add something that counts total runs. keep it simple, we can count from 0 starting now. I don't have a strong preference for implementation method.
+
+## 2026-02-19 20:47:22 UTC
+
+If I stop the bot and then start it again, will run number be lost? I would like a running total, may need to be written in a file somewhere somehow.
