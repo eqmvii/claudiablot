@@ -40,6 +40,15 @@ GAME_H = 1050
 # Template match threshold (0-1). Lower = more lenient.
 MATCH_THRESHOLD = 0.8
 
+# Directory for per-run loot screenshots
+SCREENS_DIR = "screens_from_runs"
+
+# Loot capture region — same as capture_loot.py
+LOOT_CENTER_X = 1047
+LOOT_CENTER_Y = 536
+LOOT_WIDTH    = 700
+LOOT_HEIGHT   = 640
+
 # Delay between actions (seconds)
 STEP_DELAY = 1.0
 
@@ -61,12 +70,12 @@ PORTAL_WALK_PATH = [
     (702, 730, 0.3),
     (638, 726, 0.3),
     (635, 743, 0.3),
-    (870, 710, 0.6),
-    (1309, 763, 0.8),
-    (186, 848, 0.8),
-    (476, 836, 0.8),
-    (345, 768, 0.8),
-    (260, 428, 0.8)
+    (870, 710, 0.5),
+    (1309, 763, 0.6),
+    (186, 848, 0.6),
+    (476, 836, 0.6),
+    (345, 768, 0.5),
+    (260, 428, 0.5)
     # (418, 229, 2.76),  # portal
 ]
 
@@ -154,6 +163,45 @@ def kill_pindleskin():
     pyautogui.press("alt")
 
 
+def loot_runes():
+    """Capture a loot screenshot, save it, and pick up any rune found."""
+    pyautogui.moveTo(200, 200, duration=0.2)
+    time.sleep(0.2)
+    
+    os.makedirs(SCREENS_DIR, exist_ok=True)
+
+    crop = {
+        "left":   LOOT_CENTER_X - LOOT_WIDTH  // 2,
+        "top":    LOOT_CENTER_Y - LOOT_HEIGHT // 2,
+        "width":  LOOT_WIDTH,
+        "height": LOOT_HEIGHT,
+    }
+
+    with mss.mss() as sct:
+        raw = sct.grab(crop)
+        img = np.array(raw)[:, :, :3]
+
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = os.path.join(SCREENS_DIR, f"run_{timestamp}.png")
+    cv2.imwrite(path, img)
+    print(f"Saved loot screenshot: {path}")
+
+    hits = find_runes(path)
+    if not hits:
+        print("No rune found.")
+        return
+
+    for cx, cy in hits:
+        # Crop-local coords → absolute screen coords
+        screen_x = crop["left"] + cx
+        screen_y = crop["top"]  + cy
+        print(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
+        pyautogui.moveTo(screen_x, screen_y, duration=0.5)
+        time.sleep(0.2)
+        pyautogui.click()
+        time.sleep(0.5)
+
+
 def exit_game():
     """Press Escape to open the menu then click Save and Exit."""
     print("Exiting game...")
@@ -200,11 +248,15 @@ def run_once(run_number: int):
 
     walk_to_portal()
 
+    time.sleep(0.5)
+
     blade_warp_to_pindleskin()
 
     kill_pindleskin()
 
-    print("Waiting 5 seconds for loot...")
+    loot_runes()
+
+    print("Waiting 5 seconds before next game...")
     time.sleep(5)
 
     exit_game()
