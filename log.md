@@ -241,3 +241,47 @@ looking great, just did like 20 runs without issue. Please commit this work and 
 ## 2026-02-19 03:14:51 UTC
 
 push it
+
+## 2026-02-19 14:00:43 UTC
+
+wake up claude we're going on an adventure! First I need the change directory command to enter into "CMD" to get to this directory from windows. Please update readme.md with the instructions. 
+
+## 2026-02-19 14:02:21 UTC
+
+ok good. Update to only use pushd, that's my preferred method. This app is just for me on my laptop, so we don't have to worry about generic stuff or other users.
+
+## 2026-02-19 14:07:19 UTC
+
+i may have mucked up the readme. pls fix it up again. sorry i edited files directly.
+
+## 2026-02-19 14:07:43 UTC
+
+cat the readme
+
+## 2026-02-19 14:09:33 UTC
+
+Alright, time to work on vision. We're going to save some sample images for you, please create a separate python file that will capture an image we hope in include all the items on the ground and save it in a new directory. Center your image capture at 1047, 536 and make it a 600 x 600 square to start. When I run the new python script you make, it should capture that image. I'll manually save maybe 3 runs and then have you look to think through reading the text on the screen (I'm leaning towards traditional methods, templating, OCR, etc. and away from Claude Vision - but we'll see!)
+
+## 2026-02-19 14:12:19 UTC
+
+I've got one sample. Read it so that I can get a sense for how good you are at reading items names etc. out of the box.
+
+## 2026-02-19 14:16:01 UTC
+
+I have three samples in now. Let's widen our image, maybe 50 extra pixels left and right. And to be safe add 20 pixels up and down as well, wouldn't want to miss an item. I'm impressed at your LLM-vision!
+
+## 2026-02-19 14:18:25 UTC
+
+I have a new 4th sample with a rune. Read that to understand rune colors, that will be most important for our project.
+
+## 2026-02-19 14:20:01 UTC
+
+Make sure you're reading samples/loot_20260219_091726.png
+
+## 2026-02-19 14:21:00 UTC
+
+under scarab shell boots there's orange text. Look again.
+
+## 2026-02-19 14:24:05 UTC
+
+It's actually Eth Rune silly LLM! OK, this is enough to convince me we should build our item scanner using traditional methods and not Claude Vision. Next step: create a module (separate python file?) that will read an image like the ones we have in samples/ and parse the items. It should find the blocks of text, and understand each letter one at a time. It's possible that to do this, we will need to produce templates of each letter. If so, you can start extracting them from the sample files we've alredy saved. For now, it will be important to get the color of each letter, but don't get hung up on runes vs. other item types. Go!
