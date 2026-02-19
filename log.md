@@ -309,3 +309,7 @@ Alright, we are extracting individual letter pngs from pngs that contain words a
 ## 2026-02-19 15:08:36 UTC
 
 commit this
+
+## 2026-02-19 15:09:23 UTC
+
+move all the words we've alredy processed into a new already processed folder. I'll get more words from you and we'll repeat this process.
