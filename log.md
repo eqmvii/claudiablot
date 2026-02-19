@@ -225,3 +225,15 @@ commit this
 ## 2026-02-19 02:34:17 UTC
 
 I made some manual edits to speed things up and ensure the kill. We're doing good! commit this
+
+## 2026-02-19 02:35:28 UTC
+
+Now, we have to press alt to turn item tooltips on, read them all, and dump them to a markdown log. From there I can work on picking up the ones we want (likely just runes)
+
+## 2026-02-19 02:47:16 UTC
+
+before we do that, please center the mouse in the middle of the screen after pressing h to start the game
+
+## 2026-02-19 03:14:09 UTC
+
+looking great, just did like 20 runs without issue. Please commit this work and we'll pick up again tomorrow!

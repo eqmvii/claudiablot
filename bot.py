@@ -44,25 +44,25 @@ STEP_DELAY = 1.0
 #   move_duration — seconds to take moving the mouse to (x, y)
 #   delay_after   — seconds to wait after pressing S before the next warp
 BLADE_WARP_PATH = [
-    (938, 191, 1.0, 1.0),   # warp 1
-    (1428, 269, 1.0, 1.0),
-    (1551, 165, 1.0, 1.0),
-    (1240, 120, 1.0, 1.0)
+    (938, 191, 0.7, 0.7),   # warp 1
+    (1428, 269, 0.7, 0.7),
+    (1551, 165, 0.7, 0.7),
+    (1240, 120, 0.7, 0.7)
 ]
 
 # Walk path from spawn to Anya portal.
 # Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
 # before moving to the next waypoint. Tune per-step as needed.
 PORTAL_WALK_PATH = [
-    (702, 730, 1.67),
-    (638, 726, 1.50),
-    (635, 743, 1.61),
-    (870, 710, 2.28),
-    (1309, 763, 2.15),
-    (186, 848, 2.32),
-    (476, 836, 1.82),
-    (345, 768, 2.56),
-    (260, 428, 2.8)
+    (702, 730, 0.6),
+    (638, 726, 0.6),
+    (635, 743, 0.6),
+    (870, 710, 1.3),
+    (1309, 763, 1.5),
+    (186, 848, 1.7),
+    (476, 836, 1.3),
+    (345, 768, 1.6),
+    (260, 428, 1.3)
     # (418, 229, 2.76),  # portal
 ]
 
@@ -129,7 +129,7 @@ def kill_pindleskin():
     print("Engaging Pindleskin...")
     pyautogui.moveTo(1047, 536, duration=0.3)
 
-    # Cast weakness sigil
+    # Cast lethargy sigil
     pyautogui.press("f5")
     time.sleep(0.2)
 
@@ -145,13 +145,15 @@ def kill_pindleskin():
         pyautogui.press("f")
         time.sleep(0.5)
 
-    print("Pindleskin down.")
+    print("Pindleskin down. Check loot.")
+    time.sleep(1.0)
+    pyautogui.press("alt")
 
 
 def main():
     # Waldo is always top of the list and pre-selected, so no click needed.
-    print("Starting in 3 seconds — alt-tab to D2R now...")
-    time.sleep(3)
+    print("Starting in 2 seconds — alt-tab to D2R now...")
+    time.sleep(2)
 
     # Enter the game
     print("Pressing Enter to confirm character...")
@@ -161,13 +163,17 @@ def main():
     # Select Hell difficulty
     print("Pressing H for Hell difficulty...")
     pyautogui.press("h")
+    pyautogui.moveTo(840, 525, duration=0.3)
 
     # Wait until the loading screen finishes and we're standing in town
     wait_for_game_load()
 
     print(f"Summon a pal")
-    time.sleep(0.2)
+    time.sleep(0.1)
     pyautogui.press("f8") # defiler
+    print(f"cast the healing thinger")
+    time.sleep(0.1)
+    pyautogui.press("f7") # healing hex thinger
 
     walk_to_portal()
 
