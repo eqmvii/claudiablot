@@ -393,3 +393,7 @@ Next, let's write a log file. Each entry should have the same timstamp as the pi
 ## 2026-02-19 19:43:19 UTC
 
 Next, let's write a log file. Each entry should have the same timstamp as the picture and state how many runes were found.
+
+## 2026-02-19 19:44:54 UTC
+
+and let's go ahead and git ignore @screens_from_runs/ - I want the images on disk, don't have to yeet em to GH
