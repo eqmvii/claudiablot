@@ -44,25 +44,25 @@ STEP_DELAY = 1.0
 #   move_duration — seconds to take moving the mouse to (x, y)
 #   delay_after   — seconds to wait after pressing S before the next warp
 BLADE_WARP_PATH = [
-    (938, 191, 1.2, 1.2),   # warp 1
-    (1428, 269, 1.2, 1.2),
-    (1551, 165, 1.2, 1.2),
-    (1240, 120, 1.2, 1.2)
+    (938, 191, 1.0, 1.0),   # warp 1
+    (1428, 269, 1.0, 1.0),
+    (1551, 165, 1.0, 1.0),
+    (1240, 120, 1.0, 1.0)
 ]
 
 # Walk path from spawn to Anya portal.
 # Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
 # before moving to the next waypoint. Tune per-step as needed.
 PORTAL_WALK_PATH = [
-    (702, 730, 1.87),
-    (638, 726, 1.70),
-    (635, 743, 1.81),
-    (870, 710, 2.48),
-    (1309, 763, 2.35),
-    (186, 848, 2.52),
-    (476, 836, 2.02),
-    (345, 768, 2.76),
-    (260, 428, 3.0)
+    (702, 730, 1.67),
+    (638, 726, 1.50),
+    (635, 743, 1.61),
+    (870, 710, 2.28),
+    (1309, 763, 2.15),
+    (186, 848, 2.32),
+    (476, 836, 1.82),
+    (345, 768, 2.56),
+    (260, 428, 2.8)
     # (418, 229, 2.76),  # portal
 ]
 
@@ -133,13 +133,17 @@ def kill_pindleskin():
     pyautogui.press("f5")
     time.sleep(0.2)
 
-    # 5 rounds of Abyss (D) + Miasma Bolt (F)
-    for i in range(1, 6):
-        print(f"  Attack round {i}/5")
+    # 7 rounds of Abyss (D) + 3x Miasma Bolt (F)
+    for i in range(1, 7):
+        print(f"  Attack round {i}/7")
         pyautogui.press("d")
         time.sleep(0.1)
         pyautogui.press("f")
-        time.sleep(0.8)
+        time.sleep(0.1)
+        pyautogui.press("f")
+        time.sleep(0.1)
+        pyautogui.press("f")
+        time.sleep(0.5)
 
     print("Pindleskin down.")
 
@@ -160,6 +164,10 @@ def main():
 
     # Wait until the loading screen finishes and we're standing in town
     wait_for_game_load()
+
+    print(f"Summon a pal")
+    time.sleep(0.2)
+    pyautogui.press("f8") # defiler
 
     walk_to_portal()
 
