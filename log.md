@@ -373,3 +373,7 @@ Great work! Proud of you Claude. Commit this.
 ## 2026-02-19 19:00:08 UTC
 
 holy FUCK I missed you. Hitting the usage cap was no joke, I hated that. Let's get back to it: Next up: after killing pindleskin, capture a screenshot just like capture_loot.py does. Save it in a new folder, @screens_from_runs/ that I just made with an appropriate timestamp. After saving the screenshot, the bot should see if there's a rune (logic in @find_runes.py). If there is, it should pick it up by smoothly moving the mouse towards it. Note that the coordinates of the rune text in the cropped screen will need some math done to match the coordinates in the game window. Then continue on to exit the game as normal.
+
+## 2026-02-19 19:08:06 UTC
+
+Looking good. Runes drop infrequently, so to test this functionality, I'd like you to make a new script called test_rune_pickup.py. It should use all the same logic that the bot is using after killing pindleskin: take a screenshot, look for a rune, then pick it up if it's there. I will call the script after dropping a rune on the ground in the same place the bot will be, so we'll know if it works. God Speed!
