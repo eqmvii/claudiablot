@@ -397,3 +397,11 @@ Next, let's write a log file. Each entry should have the same timstamp as the pi
 ## 2026-02-19 19:44:54 UTC
 
 and let's go ahead and git ignore @screens_from_runs/ - I want the images on disk, don't have to yeet em to GH
+
+## 2026-02-19 20:39:46 UTC
+
+let's git ignore the run log (@runs.log) and also please add a print statement of the timestamps and number of runes found to the logs, regardless of debug status. It'd be nice to see a single line print from each run while I watch.
+
+## 2026-02-19 20:41:48 UTC
+
+Great. One last change - if the run found a rune, save it to a new folder. Make it a subfolder of @screens_from_runs/ called found_runes

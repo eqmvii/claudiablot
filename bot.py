@@ -201,10 +201,15 @@ def loot_runes():
 
     with open(RUN_LOG, "a") as f:
         f.write(f"{timestamp}  runes_found={len(hits)}\n")
+    print(f"{timestamp}  runes_found={len(hits)}")
 
     if not hits:
         log("No rune found.")
         return
+
+    found_dir = os.path.join(SCREENS_DIR, "found_runes")
+    os.makedirs(found_dir, exist_ok=True)
+    cv2.imwrite(os.path.join(found_dir, f"run_{timestamp}.png"), img)
 
     for cx, cy in hits:
         # Crop-local coords → absolute screen coords
