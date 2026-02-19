@@ -44,25 +44,25 @@ STEP_DELAY = 1.0
 #   move_duration — seconds to take moving the mouse to (x, y)
 #   delay_after   — seconds to wait after pressing S before the next warp
 BLADE_WARP_PATH = [
-    (938, 191, 0.7, 0.7),   # warp 1
-    (1428, 269, 0.7, 0.7),
-    (1551, 165, 0.7, 0.7),
-    (1240, 120, 0.7, 0.7)
+    (938, 191, 0.5, 0.5),   # warp 1
+    (1428, 269, 0.5, 0.5),
+    (1551, 165, 0.5, 0.5),
+    (1240, 120, 0.5, 0.5)
 ]
 
 # Walk path from spawn to Anya portal.
 # Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
 # before moving to the next waypoint. Tune per-step as needed.
 PORTAL_WALK_PATH = [
-    (702, 730, 0.6),
-    (638, 726, 0.6),
-    (635, 743, 0.6),
-    (870, 710, 1.3),
-    (1309, 763, 1.5),
-    (186, 848, 1.7),
-    (476, 836, 1.3),
-    (345, 768, 1.6),
-    (260, 428, 1.3)
+    (702, 730, 0.3),
+    (638, 726, 0.3),
+    (635, 743, 0.3),
+    (870, 710, 0.6),
+    (1309, 763, 0.8),
+    (186, 848, 0.8),
+    (476, 836, 0.8),
+    (345, 768, 0.8),
+    (260, 428, 0.8)
     # (418, 229, 2.76),  # portal
 ]
 
@@ -150,10 +150,29 @@ def kill_pindleskin():
     pyautogui.press("alt")
 
 
-def main():
-    # Waldo is always top of the list and pre-selected, so no click needed.
-    print("Starting in 2 seconds — alt-tab to D2R now...")
-    time.sleep(2)
+def exit_game():
+    """Press Escape to open the menu then click Save and Exit."""
+    print("Exiting game...")
+    pyautogui.press("escape")
+    time.sleep(0.5)
+    pyautogui.moveTo(819, 507, duration=0.4)
+    pyautogui.click()
+    print("Save and Exit clicked.")
+
+
+def wait_for_play_button():
+    """Block until the Play button is visible, indicating we're on character select."""
+    template = cv2.imread("templates/play_button.png")
+    region = {"left": 765, "top": 951, "width": 160, "height": 80}
+    print("Waiting for character select screen (watching for Play button)...")
+    while not template_visible(template, region):
+        time.sleep(0.5)
+    print("Character select screen detected.")
+
+
+def run_once(run_number: int):
+    """Execute one full Pindleskin farming run."""
+    print(f"\n=== Run {run_number} ===")
 
     # Enter the game
     print("Pressing Enter to confirm character...")
@@ -168,10 +187,10 @@ def main():
     # Wait until the loading screen finishes and we're standing in town
     wait_for_game_load()
 
-    print(f"Summon a pal")
+    print("Summon a pal")
     time.sleep(0.1)
     pyautogui.press("f8") # defiler
-    print(f"cast the healing thinger")
+    print("Cast the healing thinger")
     time.sleep(0.1)
     pyautogui.press("f7") # healing hex thinger
 
@@ -180,6 +199,22 @@ def main():
     blade_warp_to_pindleskin()
 
     kill_pindleskin()
+
+    print("Waiting 5 seconds for loot...")
+    time.sleep(5)
+
+    exit_game()
+
+
+def main():
+    print("Starting in 2 seconds — alt-tab to D2R now...")
+    time.sleep(2)
+
+    run_number = 1
+    while True:
+        run_once(run_number)
+        run_number += 1
+        wait_for_play_button()
 
 
 if __name__ == "__main__":

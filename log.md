@@ -333,3 +333,15 @@ yes, process Orb. The letters are yellow but no matter, we will do some grayscal
 ## 2026-02-19 15:31:00 UTC
 
 commit this
+
+## 2026-02-19 15:36:19 UTC
+
+Write a function for bot.py to call when it needs to exit the game, after killing pindleskin and handling loot. It should press escape, then smoothly move the mouse to 819, 507, then click
+
+## 2026-02-19 15:37:58 UTC
+
+845, 991 is the coordinates of a Play button that is a static UI element proving we're on the character select scren. Capture that a template of that button now.
+
+## 2026-02-19 15:46:00 UTC
+
+commit this
