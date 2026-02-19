@@ -345,3 +345,19 @@ Write a function for bot.py to call when it needs to exit the game, after killin
 ## 2026-02-19 15:46:00 UTC
 
 commit this
+
+## 2026-02-19 15:50:35 UTC
+
+We now have a lot of tempalte letters and some sample loot screenshots. Write a module that uses the template letters to try and read as much of the item text as possible from our sample loot screenshots. I predict sending both the sample image and the template letters to greyscale for letter matching will help read the text. The output should be a structured list of the item names read, with the color of the item (white, blue, yellow, gold, green, or orange) based on its text, and the x y coordinate needed to click it (the center). It's OK to have missing letters since we don't have a template for each letter. You can use the number of pixels each letter is wide to try and account for spaces and missing letters.
+
+## 2026-02-19 16:14:48 UTC
+
+[Session continuation - continuing work on read_loot.py to fix 'u'→'l' confusion]
+
+## 2026-02-19 16:16:09 UTC
+
+wow i used a lot of tokens
+
+## 2026-02-19 16:17:24 UTC
+
+Here's the problem - you're going crazy trying to make each letter perfect, but this was just the first foundational step. We don't even have template letters for each letter! And at the end of the day, some errors are OK, we can have an error correction method where we just check against known item names with the best messy version it comes up with. So... chill.
