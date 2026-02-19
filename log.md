@@ -325,3 +325,11 @@ Four new word pngs in samples/Words. Please process them and save individual let
 ## 2026-02-19 15:25:55 UTC
 
 commit this
+
+## 2026-02-19 15:28:54 UTC
+
+yes, process Orb. The letters are yellow but no matter, we will do some grayscale stuff eventually anyway
+
+## 2026-02-19 15:31:00 UTC
+
+commit this
