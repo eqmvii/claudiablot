@@ -369,3 +369,7 @@ We're going to create a SUPER simple version of OCR for Diablo loot. We just wan
 ## 2026-02-19 17:10:41 UTC
 
 Great work! Proud of you Claude. Commit this.
+
+## 2026-02-19 17:14:07 UTC
+
+Next up: after killing pindleskin, capture a screenshot just like capture_loot.py does. Save it in a new folder, @screens_from_runs/ that I just made with an appropriate timestamp. After saving the screenshot, the boy should see if there's a rune. If there is, it should pick it up by smoothly moving the mouse towards it. Note that the coordinates of the rune text in teh cropped screen will need some math done to match the coordinates in teh game window. After picking up a rune, we should repeat the process until no runes are detected - there is a small chance more than one rune will drop from teh boss!  

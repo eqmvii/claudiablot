@@ -15,13 +15,17 @@ One-time setup required before running:
     python capture_template.py   (while standing in town in-game)
 """
 
+import os
 import sys
 import time
+from datetime import datetime
 
 import cv2
 import mss
 import numpy as np
 import pyautogui
+
+from find_runes import find_runes
 
 # ---------------------------------------------------------------------------
 # Game window config.
