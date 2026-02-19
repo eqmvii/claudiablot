@@ -43,29 +43,16 @@ STEP_DELAY = 1.0
 # Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
 # before moving to the next waypoint. Tune per-step as needed.
 PORTAL_WALK_PATH = [
-    (747, 683, 1.58),
-    (735, 653, 1.31),
-    (717, 646, 1.23),
-    (698, 631, 0.92),
-    (833, 615, 0.74),
-    (845, 626, 0.67),
-    (864, 617, 0.92),
-    (898, 596, 0.80),
-    (804, 588, 0.87),
-    (764, 588, 0.68),
-    (749, 588, 0.65),
-    (757, 592, 0.66),
-    (816, 592, 0.60),
-    (949, 589, 0.67),
-    (870, 595, 0.58),
-    (790, 602, 0.60),
-    (733, 616, 0.62),
-    (729, 598, 0.55),
-    (728, 597, 0.56),
-    (728, 597, 0.55),
-    (723, 576, 1.52),
-    (736, 461, 1.82),
-    (589, 176, 3.0)
+    (702, 730, 1.87),
+    (638, 726, 1.70),
+    (635, 743, 1.81),
+    (870, 710, 2.48),
+    (1309, 763, 2.35),
+    (186, 848, 2.52),
+    (476, 836, 2.02),
+    (345, 768, 2.76),
+    (260, 428, 3.0)
+    # (418, 229, 2.76),  # portal
 ]
 
 
@@ -108,13 +95,9 @@ def walk_to_portal():
     time.sleep(1)
     for i, (x, y, delay) in enumerate(PORTAL_WALK_PATH, 1):
         print(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
-        if i == len(PORTAL_WALK_PATH):
-            # Move first, pause so the game registers hover, then click in place
-            pyautogui.moveTo(x, y, duration=0.3)
-            time.sleep(0.3)
-            pyautogui.click()
-        else:
-            pyautogui.click(x, y)
+        pyautogui.moveTo(x, y, duration=0.3)
+        time.sleep(0.2)
+        pyautogui.click()
         time.sleep(delay)
     print("Entered portal.")
 

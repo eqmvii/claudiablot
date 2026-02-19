@@ -189,3 +189,15 @@ pyautogui must be doing something kind of weird. Can we move the mouse there bef
 ## 2026-02-19 01:45:19 UTC
 
 you beautiful LLM that did it! We should probably have been moving the mouse before clicking the whole time, but chicken mcfuckit, this works. I'll do a lil more testing, you commit and push. Well done!
+
+## 2026-02-19 01:47:39 UTC
+
+re-write the whole walk script so the mouse is smoothly moving to the location BEFORE the click. The teleport clicks were definitely a problem.
+
+## 2026-02-19 01:50:53 UTC
+
+I re-recorded the walk. Use the mouse moving and make the lil sleep more like 0.2 instead of 0.1 and maybe this will work? It's more finicky than I remember the last time I did this, but we'll get there!
+
+## 2026-02-19 02:02:11 UTC
+
+commit this
