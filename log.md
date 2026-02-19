@@ -285,3 +285,27 @@ under scarab shell boots there's orange text. Look again.
 ## 2026-02-19 14:24:05 UTC
 
 It's actually Eth Rune silly LLM! OK, this is enough to convince me we should build our item scanner using traditional methods and not Claude Vision. Next step: create a module (separate python file?) that will read an image like the ones we have in samples/ and parse the items. It should find the blocks of text, and understand each letter one at a time. It's possible that to do this, we will need to produce templates of each letter. If so, you can start extracting them from the sample files we've alredy saved. For now, it will be important to get the color of each letter, but don't get hung up on runes vs. other item types. Go!
+
+## 2026-02-19 14:27:34 UTC
+
+run it
+
+## 2026-02-19 14:35:00 UTC
+
+some have letters and some are VERY, just hunks of color. I confess I don't know why you're doing zoom either, but you have your ways. Let's try having your big brain computer look at each file and discard if it's not obviously a eltter, rename it to the letter that it is (and upper or lower  case) if you got it right.
+
+## 2026-02-19 14:43:13 UTC
+
+We're working on reading screenshots of diablo 2 items with python. You have templates/letters/raw with sheets of letters from an earlier session. Read each sheet and create a separate folder for uppercase and lowercase letters of each color, and create a separate labeled image for each letter you remove from the sheet. Some entries in the sheets are noise, not actually letters. 
+
+## 2026-02-19 14:57:00 UTC
+
+Alright, we are extracting individual letter pngs from pngs that contain words and phrases. I have done one for you - the lowercase letter u - in templates/letters/lower. I need you to extract all letters into individual template letters from the samples/Words directory. Go!
+
+## 2026-02-19 15:06:10 UTC
+
+(empty message)
+
+## 2026-02-19 15:08:36 UTC
+
+commit this
