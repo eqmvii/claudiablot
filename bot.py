@@ -37,11 +37,17 @@ GAME_Y = 0      # top edge of game window on screen
 GAME_W = 1680
 GAME_H = 1050
 
+# Set to True to print step-by-step progress to the console.
+VERBOSE = False
+
 # Template match threshold (0-1). Lower = more lenient.
 MATCH_THRESHOLD = 0.8
 
 # Directory for per-run loot screenshots
 SCREENS_DIR = "screens_from_runs"
+
+# Log file for run results
+RUN_LOG = "runs.log"
 
 # Loot capture region — same as capture_loot.py
 LOOT_CENTER_X = 1047
@@ -80,6 +86,11 @@ PORTAL_WALK_PATH = [
 ]
 
 
+def log(msg):
+    if VERBOSE:
+        print(msg)
+
+
 def capture_region(region: dict) -> np.ndarray:
     """Grab a screen region and return as a BGR numpy array."""
     with mss.mss() as sct:
@@ -100,46 +111,46 @@ def wait_for_game_load():
     template_path = "templates/ui_cross.png"
     template = cv2.imread(template_path)
     if template is None:
-        print(f"ERROR: Template not found at '{template_path}'.")
-        print("Run capture_template.py while in-game first.")
+        log(f"ERROR: Template not found at '{template_path}'.")
+        log("Run capture_template.py while in-game first.")
         sys.exit(1)
 
     # Scan the full bottom strip — template matching finds the cross wherever it is
     region = {"left": 0, "top": 900, "width": 1680, "height": 200}
 
-    print("Waiting for game to load (watching for UI cross)...")
+    log("Waiting for game to load (watching for UI cross)...")
     while not template_visible(template, region):
         time.sleep(0.5)
-    print("Game loaded — UI detected, in town.")
+    log("Game loaded — UI detected, in town.")
 
 
 def walk_to_portal():
     """Click through the waypoint path to reach the Anya portal."""
-    print(f"Walking to Anya portal ({len(PORTAL_WALK_PATH)} waypoints)...")
+    log(f"Walking to Anya portal ({len(PORTAL_WALK_PATH)} waypoints)...")
     time.sleep(1)
     for i, (x, y, delay) in enumerate(PORTAL_WALK_PATH, 1):
-        print(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
+        log(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
         pyautogui.moveTo(x, y, duration=0.3)
         time.sleep(0.2)
         pyautogui.click()
         time.sleep(delay)
-    print("Entered portal.")
+    log("Entered portal.")
 
 
 def blade_warp_to_pindleskin():
     """Blade Warp through the temple to reach Pindleskin."""
-    print(f"Blade Warping to Pindleskin ({len(BLADE_WARP_PATH)} warps)...")
+    log(f"Blade Warping to Pindleskin ({len(BLADE_WARP_PATH)} warps)...")
     for i, (x, y, move_dur, delay) in enumerate(BLADE_WARP_PATH, 1):
-        print(f"  Warp {i}/{len(BLADE_WARP_PATH)}: ({x}, {y})")
+        log(f"  Warp {i}/{len(BLADE_WARP_PATH)}: ({x}, {y})")
         pyautogui.moveTo(x, y, duration=move_dur)
         pyautogui.press("s")
         time.sleep(delay)
-    print("Arrived at Pindleskin.")
+    log("Arrived at Pindleskin.")
 
 
 def kill_pindleskin():
     """Fight Pindleskin: cast weakness sigil then alternate Abyss and Miasma Bolt."""
-    print("Engaging Pindleskin...")
+    log("Engaging Pindleskin...")
     pyautogui.moveTo(1047, 536, duration=0.3)
 
     # Cast lethargy sigil
@@ -148,7 +159,7 @@ def kill_pindleskin():
 
     # 7 rounds of Abyss (D) + 3x Miasma Bolt (F)
     for i in range(1, 7):
-        print(f"  Attack round {i}/7")
+        log(f"  Attack round {i}/7")
         pyautogui.press("d")
         time.sleep(0.1)
         pyautogui.press("f")
@@ -158,7 +169,7 @@ def kill_pindleskin():
         pyautogui.press("f")
         time.sleep(0.5)
 
-    print("Pindleskin down. Check loot.")
+    log("Pindleskin down. Check loot.")
     time.sleep(1.0)
     pyautogui.press("alt")
 
@@ -167,7 +178,7 @@ def loot_runes():
     """Capture a loot screenshot, save it, and pick up any rune found."""
     pyautogui.moveTo(200, 200, duration=0.2)
     time.sleep(0.2)
-    
+
     os.makedirs(SCREENS_DIR, exist_ok=True)
 
     crop = {
@@ -184,18 +195,22 @@ def loot_runes():
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(SCREENS_DIR, f"run_{timestamp}.png")
     cv2.imwrite(path, img)
-    print(f"Saved loot screenshot: {path}")
+    log(f"Saved loot screenshot: {path}")
 
     hits = find_runes(path)
+
+    with open(RUN_LOG, "a") as f:
+        f.write(f"{timestamp}  runes_found={len(hits)}\n")
+
     if not hits:
-        print("No rune found.")
+        log("No rune found.")
         return
 
     for cx, cy in hits:
         # Crop-local coords → absolute screen coords
         screen_x = crop["left"] + cx
         screen_y = crop["top"]  + cy
-        print(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
+        log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
         pyautogui.moveTo(screen_x, screen_y, duration=0.5)
         time.sleep(0.2)
         pyautogui.click()
@@ -204,45 +219,45 @@ def loot_runes():
 
 def exit_game():
     """Press Escape to open the menu then click Save and Exit."""
-    print("Exiting game...")
+    log("Exiting game...")
     pyautogui.press("escape")
     time.sleep(0.5)
     pyautogui.moveTo(819, 507, duration=0.4)
     pyautogui.click()
-    print("Save and Exit clicked.")
+    log("Save and Exit clicked.")
 
 
 def wait_for_play_button():
     """Block until the Play button is visible, indicating we're on character select."""
     template = cv2.imread("templates/play_button.png")
     region = {"left": 765, "top": 951, "width": 160, "height": 80}
-    print("Waiting for character select screen (watching for Play button)...")
+    log("Waiting for character select screen (watching for Play button)...")
     while not template_visible(template, region):
         time.sleep(0.5)
-    print("Character select screen detected.")
+    log("Character select screen detected.")
 
 
 def run_once(run_number: int):
     """Execute one full Pindleskin farming run."""
-    print(f"\n=== Run {run_number} ===")
+    log(f"\n=== Run {run_number} ===")
 
     # Enter the game
-    print("Pressing Enter to confirm character...")
+    log("Pressing Enter to confirm character...")
     pyautogui.press("enter")
     time.sleep(STEP_DELAY)
 
     # Select Hell difficulty
-    print("Pressing H for Hell difficulty...")
+    log("Pressing H for Hell difficulty...")
     pyautogui.press("h")
     pyautogui.moveTo(840, 525, duration=0.3)
 
     # Wait until the loading screen finishes and we're standing in town
     wait_for_game_load()
 
-    print("Summon a pal")
+    log("Summon a pal")
     time.sleep(0.1)
     pyautogui.press("f8") # defiler
-    print("Cast the healing thinger")
+    log("Cast the healing thinger")
     time.sleep(0.1)
     pyautogui.press("f7") # healing hex thinger
 
@@ -256,14 +271,14 @@ def run_once(run_number: int):
 
     loot_runes()
 
-    print("Waiting 5 seconds before next game...")
+    log("Waiting 5 seconds before next game...")
     time.sleep(5)
 
     exit_game()
 
 
 def main():
-    print("Starting in 2 seconds — alt-tab to D2R now...")
+    log("Starting in 2 seconds — alt-tab to D2R now...")
     time.sleep(2)
 
     run_number = 1

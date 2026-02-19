@@ -381,3 +381,15 @@ Looking good. Runes drop infrequently, so to test this functionality, I'd like y
 ## 2026-02-19 19:15:49 UTC
 
 Worked great, congratulations Claude, you did it!
+
+## 2026-02-19 19:41:34 UTC
+
+Let's make some updates to logging. First, some kind of global variable for verbose logs. Set it to false, and make everything that currently logs to the console only log if that variable is true. 
+
+## 2026-02-19 19:46:05 UTC
+
+Next, let's write a log file. Each entry should have the same timstamp as the picture and state how many runes were found.
+
+## 2026-02-19 19:43:19 UTC
+
+Next, let's write a log file. Each entry should have the same timstamp as the picture and state how many runes were found.
