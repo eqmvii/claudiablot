@@ -39,6 +39,17 @@ MATCH_THRESHOLD = 0.8
 # Delay between actions (seconds)
 STEP_DELAY = 1.0
 
+# Blade Warp path from Anya portal into Nihlathak's temple to reach Pindleskin.
+# Each entry is (x, y, move_duration, delay_after) where:
+#   move_duration — seconds to take moving the mouse to (x, y)
+#   delay_after   — seconds to wait after pressing S before the next warp
+BLADE_WARP_PATH = [
+    (938, 191, 1.2, 1.2),   # warp 1
+    (1428, 269, 1.2, 1.2),
+    (1551, 165, 1.2, 1.2),
+    (1240, 120, 1.2, 1.2)
+]
+
 # Walk path from spawn to Anya portal.
 # Each entry is (x, y, delay_seconds) — delay is how long to wait AFTER the click
 # before moving to the next waypoint. Tune per-step as needed.
@@ -102,6 +113,37 @@ def walk_to_portal():
     print("Entered portal.")
 
 
+def blade_warp_to_pindleskin():
+    """Blade Warp through the temple to reach Pindleskin."""
+    print(f"Blade Warping to Pindleskin ({len(BLADE_WARP_PATH)} warps)...")
+    for i, (x, y, move_dur, delay) in enumerate(BLADE_WARP_PATH, 1):
+        print(f"  Warp {i}/{len(BLADE_WARP_PATH)}: ({x}, {y})")
+        pyautogui.moveTo(x, y, duration=move_dur)
+        pyautogui.press("s")
+        time.sleep(delay)
+    print("Arrived at Pindleskin.")
+
+
+def kill_pindleskin():
+    """Fight Pindleskin: cast weakness sigil then alternate Abyss and Miasma Bolt."""
+    print("Engaging Pindleskin...")
+    pyautogui.moveTo(1047, 536, duration=0.3)
+
+    # Cast weakness sigil
+    pyautogui.press("f5")
+    time.sleep(0.2)
+
+    # 5 rounds of Abyss (D) + Miasma Bolt (F)
+    for i in range(1, 6):
+        print(f"  Attack round {i}/5")
+        pyautogui.press("d")
+        time.sleep(0.1)
+        pyautogui.press("f")
+        time.sleep(0.8)
+
+    print("Pindleskin down.")
+
+
 def main():
     # Waldo is always top of the list and pre-selected, so no click needed.
     print("Starting in 3 seconds — alt-tab to D2R now...")
@@ -121,7 +163,9 @@ def main():
 
     walk_to_portal()
 
-    print("Ready — next step: kill Pindleskin.")
+    blade_warp_to_pindleskin()
+
+    kill_pindleskin()
 
 
 if __name__ == "__main__":

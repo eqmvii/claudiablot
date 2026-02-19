@@ -201,3 +201,23 @@ I re-recorded the walk. Use the mouse moving and make the lil sleep more like 0.
 ## 2026-02-19 02:02:11 UTC
 
 commit this
+
+## 2026-02-19 02:03:47 UTC
+
+ok, we're going to do the next section: using "Blade Warp" skill to get to pindleskon. It's a new skill similar to teleport but slower. You're going to smoothly move the mouse to coordinate 938, 191 and then press the "S" key, which is what I've bound blade warp to. Take 1.4 seconds to do that. I'll then play the script, see where I wind up, and give you the next coordinate - it will take us a few.
+
+## 2026-02-19 02:07:36 UTC
+
+1428, 269 next
+
+## 2026-02-19 02:15:46 UTC
+
+ok I added some and got us right on top of pindleskin! Now it's time to fight. Move the moouse slightly down and right, press f5 once (my hotkey for a a weakness sigil), then wait 0.2 seconds and start a loop: 5 total times, press D (abyss skill) and then 0.1 seconds later press F (miasma bolt skill) and then wait 0.8 seconds. That should kill him.
+
+## 2026-02-19 02:21:04 UTC
+
+1047, 536 is the exact coordinate I want you to quickly but smoothly move the mouse to after the final blade warp and before beginning the attack loop
+
+## 2026-02-19 02:22:38 UTC
+
+commit this
