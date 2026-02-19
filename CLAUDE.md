@@ -20,8 +20,4 @@ Get the timestamp via `date -u +"%Y-%m-%d %H:%M:%S UTC"`.
 
 ## Project Status
 
-The repository is newly initialized. No build system, dependencies, or source files have been established yet. When implementing, update this file with:
-- Build/run commands
-- Language and framework choices
-- Architecture overview
-- How to run tests
+We have a good gameplay loop going. The next step is going to be reading item names from screenshots. 

@@ -361,3 +361,11 @@ wow i used a lot of tokens
 ## 2026-02-19 16:17:24 UTC
 
 Here's the problem - you're going crazy trying to make each letter perfect, but this was just the first foundational step. We don't even have template letters for each letter! And at the end of the day, some errors are OK, we can have an error correction method where we just check against known item names with the best messy version it comes up with. So... chill.
+
+## 2026-02-19 17:00:58 UTC
+
+We're going to create a SUPER simple version of OCR for Diablo loot. We just want to see if the word "Rune" appears in any screenshot. Our test case will be the images in samples/ and samples/Old. Our template is @templates/words/Rune.png in @templates/words/. Write a simple module that when run on its own scans all PNG files in @samples/ and its subfolders and returns the X, Y coordinates of the center of any instances of the word Rune. Eventually we will call this from bot.py to pick up any runes that drop before going to the next game. For your context, the letters are likely to always have the same shape and color but the background will sometimes be a little different, so we're not looking for an exact match. 
+
+## 2026-02-19 17:10:41 UTC
+
+Great work! Proud of you Claude. Commit this.
