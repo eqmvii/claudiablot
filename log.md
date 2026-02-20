@@ -421,3 +421,11 @@ I found the bot picked up a yellow Rune Bow and a blue Rune Scepter. Funny! Can 
 ## 2026-02-20 00:46:00 UTC
 
 We can test it because we keep screenshots! Test everything in the screens_from_runs/found_runes folder with the new code and see which you think are Runes and which are other items with the word Rune in them. What fun!
+
+## 2026-02-20 00:56:00 UTC
+
+I think we have enough screenshots without rune drops. Edit the bot to either not saving a screenshot in the first place (but maybe we need it for rune detection?) or else to delete it afterward UNLESS it had a rune. We do still want to keep a copy of every time we see a rune and pick it up.
+
+## 2026-02-20 01:02:00 UTC
+
+Let's also keep two more long-running tallies: (1) total runes found, currently 9 - write it to a file so we can track like total runs. Second, total Mal+ runes found, which is 0. I will manually edit this when they get found, since we can't currently detect them with our OCR. Just ensure it's a line in a file somewhere alongside our other long running stats.

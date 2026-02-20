@@ -3,3 +3,4 @@ __pycache__/
 *.pyc
 screens_from_runs/
 runs.log
+totals.txt

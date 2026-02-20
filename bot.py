@@ -49,6 +49,9 @@ SCREENS_DIR = "screens_from_runs"
 # Log file for run results
 RUN_LOG = "runs.log"
 
+# Persistent totals file (human-editable key=value lines)
+TOTALS_FILE = "totals.txt"
+
 # Loot capture region — same as capture_loot.py
 LOOT_CENTER_X = 1047
 LOOT_CENTER_Y = 536
@@ -174,6 +177,25 @@ def kill_pindleskin():
     pyautogui.press("alt")
 
 
+def _read_totals() -> dict:
+    totals = {"total_runes_found": 0, "mal_plus_runes_found": 0}
+    try:
+        with open(TOTALS_FILE) as f:
+            for line in f:
+                key, _, val = line.strip().partition("=")
+                if key in totals:
+                    totals[key] = int(val)
+    except FileNotFoundError:
+        pass
+    return totals
+
+
+def _write_totals(totals: dict) -> None:
+    with open(TOTALS_FILE, "w") as f:
+        for key, val in totals.items():
+            f.write(f"{key}={val}\n")
+
+
 def loot_runes(run_number: int):
     """Capture a loot screenshot, save it, and pick up any rune found."""
     pyautogui.moveTo(200, 200, duration=0.2)
@@ -205,11 +227,16 @@ def loot_runes(run_number: int):
 
     if not hits:
         log("No rune found.")
+        os.remove(path)
         return
 
     found_dir = os.path.join(SCREENS_DIR, "found_runes")
     os.makedirs(found_dir, exist_ok=True)
     cv2.imwrite(os.path.join(found_dir, f"run_{timestamp}.png"), img)
+
+    totals = _read_totals()
+    totals["total_runes_found"] += len(hits)
+    _write_totals(totals)
 
     for cx, cy in hits:
         # Crop-local coords → absolute screen coords
