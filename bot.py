@@ -61,6 +61,9 @@ LOOT_HEIGHT   = 640
 # Delay between actions (seconds)
 STEP_DELAY = 1.0
 
+# Move the mouse left of this x-coordinate to abort the bot cleanly.
+ABORT_ZONE_X = 100
+
 # Blade Warp path from Anya portal into Nihlathak's temple to reach Pindleskin.
 # Each entry is (x, y, move_duration, delay_after) where:
 #   move_duration — seconds to take moving the mouse to (x, y)
@@ -87,6 +90,27 @@ PORTAL_WALK_PATH = [
     (260, 428, 0.5)
     # (418, 229, 2.76),  # portal
 ]
+
+
+class AbortBot(Exception):
+    """Raised when the user moves the mouse into the abort zone (x < ABORT_ZONE_X)."""
+
+
+def check_abort():
+    """Raise AbortBot if the mouse is in the abort zone."""
+    if pyautogui.position().x < ABORT_ZONE_X:
+        raise AbortBot("Mouse moved into abort zone — stopping bot.")
+
+
+def safe_sleep(seconds: float):
+    """Sleep for *seconds*, checking for abort every 0.1 s."""
+    steps = int(seconds / 0.1)
+    for _ in range(steps):
+        check_abort()
+        time.sleep(0.1)
+    remainder = seconds - steps * 0.1
+    if remainder > 0:
+        time.sleep(remainder)
 
 
 def log(msg):
@@ -123,6 +147,7 @@ def wait_for_game_load():
 
     log("Waiting for game to load (watching for UI cross)...")
     while not template_visible(template, region):
+        check_abort()
         time.sleep(0.5)
     log("Game loaded — UI detected, in town.")
 
@@ -130,13 +155,13 @@ def wait_for_game_load():
 def walk_to_portal():
     """Click through the waypoint path to reach the Anya portal."""
     log(f"Walking to Anya portal ({len(PORTAL_WALK_PATH)} waypoints)...")
-    time.sleep(1)
+    safe_sleep(1)
     for i, (x, y, delay) in enumerate(PORTAL_WALK_PATH, 1):
         log(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
         pyautogui.moveTo(x, y, duration=0.3)
-        time.sleep(0.2)
+        safe_sleep(0.2)
         pyautogui.click()
-        time.sleep(delay)
+        safe_sleep(delay)
     log("Entered portal.")
 
 
@@ -147,7 +172,7 @@ def blade_warp_to_pindleskin():
         log(f"  Warp {i}/{len(BLADE_WARP_PATH)}: ({x}, {y})")
         pyautogui.moveTo(x, y, duration=move_dur)
         pyautogui.press("s")
-        time.sleep(delay)
+        safe_sleep(delay)
     log("Arrived at Pindleskin.")
 
 
@@ -158,22 +183,22 @@ def kill_pindleskin():
 
     # Cast lethargy sigil
     pyautogui.press("f5")
-    time.sleep(0.2)
+    safe_sleep(0.2)
 
     # 7 rounds of Abyss (D) + 3x Miasma Bolt (F)
     for i in range(1, 7):
         log(f"  Attack round {i}/7")
         pyautogui.press("d")
-        time.sleep(0.1)
+        safe_sleep(0.1)
         pyautogui.press("f")
-        time.sleep(0.1)
+        safe_sleep(0.1)
         pyautogui.press("f")
-        time.sleep(0.1)
+        safe_sleep(0.1)
         pyautogui.press("f")
-        time.sleep(0.5)
+        safe_sleep(0.5)
 
     log("Pindleskin down. Check loot.")
-    time.sleep(1.0)
+    safe_sleep(1.0)
     pyautogui.press("alt")
 
 
@@ -237,9 +262,9 @@ def loot_runes(run_number: int):
         screen_y = crop["top"]  + cy
         log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
         pyautogui.moveTo(screen_x, screen_y, duration=0.5)
-        time.sleep(0.2)
+        safe_sleep(0.2)
         pyautogui.click()
-        time.sleep(0.5)
+        safe_sleep(0.5)
         runes_picked += 1
 
     with open(RUN_LOG, "a") as f:
@@ -276,7 +301,7 @@ def exit_game():
     """Press Escape to open the menu then click Save and Exit."""
     log("Exiting game...")
     pyautogui.press("escape")
-    time.sleep(0.5)
+    safe_sleep(0.5)
     pyautogui.moveTo(819, 507, duration=0.4)
     pyautogui.click()
     log("Save and Exit clicked.")
@@ -288,6 +313,7 @@ def wait_for_play_button():
     region = {"left": 765, "top": 951, "width": 160, "height": 80}
     log("Waiting for character select screen (watching for Play button)...")
     while not template_visible(template, region):
+        check_abort()
         time.sleep(0.5)
     log("Character select screen detected.")
 
@@ -299,7 +325,7 @@ def run_once(run_number: int):
     # Enter the game
     log("Pressing Enter to confirm character...")
     pyautogui.press("enter")
-    time.sleep(STEP_DELAY)
+    safe_sleep(STEP_DELAY)
 
     # Select Hell difficulty
     log("Pressing H for Hell difficulty...")
@@ -310,15 +336,15 @@ def run_once(run_number: int):
     wait_for_game_load()
 
     log("Summon a pal")
-    time.sleep(0.1)
+    safe_sleep(0.1)
     pyautogui.press("f8") # defiler
     log("Cast the healing thinger")
-    time.sleep(0.1)
+    safe_sleep(0.1)
     pyautogui.press("f7") # healing hex thinger
 
     walk_to_portal()
 
-    time.sleep(0.5)
+    safe_sleep(0.5)
 
     blade_warp_to_pindleskin()
 
@@ -327,7 +353,7 @@ def run_once(run_number: int):
     loot_runes(run_number)
 
     log("Waiting before next game...")
-    time.sleep(0.5)
+    safe_sleep(0.5)
 
     exit_game()
 
@@ -341,14 +367,18 @@ def _load_run_count() -> int:
 
 
 def main():
-    log("Starting in 2 seconds — alt-tab to D2R now...")
+    print(f"Bot starting — move mouse left of x={ABORT_ZONE_X} at any time to stop.")
     time.sleep(2)
 
     run_number = _load_run_count() + 1
-    while True:
-        run_once(run_number)
-        run_number += 1
-        wait_for_play_button()
+    try:
+        while True:
+            run_once(run_number)
+            run_number += 1
+            wait_for_play_button()
+    except AbortBot as e:
+        print(f"\n[ABORTED] {e}")
+        print("Bot stopped cleanly. Good luck with the runes!")
 
 
 if __name__ == "__main__":

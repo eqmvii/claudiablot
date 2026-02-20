@@ -441,3 +441,7 @@ We're going to write some tests for OCR. These will all fail, but having them wi
 ## 
 
 Run the tests, and if it doesn't exist, stub read_items and make it return some empty data structure or something so I can see the tests running and failing, not blowing up for missing module
+
+## 
+
+Is there a simple way you can make the bot interuptable? Say, cancel the python script if I manually move the mouse west of the 100 pixel mark (an area the bot will never touch) or something? Not sure if that's tricky due to threads or listeners or whatever in python land, I'm more familiar with JS\!
