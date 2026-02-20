@@ -222,12 +222,16 @@ def loot_runes(run_number: int):
     hits = find_runes(path)
 
     with open(RUN_LOG, "a") as f:
-        f.write(f"{timestamp}  run={run_number}  runes_found={len(hits)}\n")
-    print(f"{timestamp}  run={run_number}  runes_found={len(hits)}")
+        if hits:
+            f.write(f"{timestamp}  run={run_number}  RUNE x{len(hits)}\n")
+        else:
+            f.write(f"{timestamp}  run={run_number}  no runes\n")
 
     if not hits:
         log("No rune found.")
         os.remove(path)
+        totals = _read_totals()
+        print(f"{timestamp}  run={run_number:>4}  ·  no runes  (all-time: {totals['total_runes_found']})")
         return
 
     found_dir = os.path.join(SCREENS_DIR, "found_runes")
@@ -237,6 +241,15 @@ def loot_runes(run_number: int):
     totals = _read_totals()
     totals["total_runes_found"] += len(hits)
     _write_totals(totals)
+
+    n = len(hits)
+    total = totals["total_runes_found"]
+    bar = "★" + "═" * 36 + "★"
+    rune_word = "rune" if total == 1 else "runes"
+    print(f"\n{bar}")
+    print(f"  ✦  RUNE ACQUIRED!{'  x' + str(n) if n > 1 else ''}  ✦")
+    print(f"  run {run_number}  ·  all-time total: {total} {rune_word}")
+    print(f"{bar}\n")
 
     for cx, cy in hits:
         # Crop-local coords → absolute screen coords

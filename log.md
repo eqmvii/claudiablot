@@ -429,3 +429,7 @@ I think we have enough screenshots without rune drops. Edit the bot to either no
 ## 2026-02-20 01:02:00 UTC
 
 Let's also keep two more long-running tallies: (1) total runes found, currently 9 - write it to a file so we can track like total runs. Second, total Mal+ runes found, which is 0. I will manually edit this when they get found, since we can't currently detect them with our OCR. Just ensure it's a line in a file somewhere alongside our other long running stats.
+
+## 
+
+morning claude. Let's change the main logging in @bot.py - the one line that logs even when debug is off - to also list total runes found. Let's also change "runes_found=NUMBER" to be a little more human readable, just say "No runes" or else print with extra new lines and PAZAZ "RUNE ACQUIRED" or something that makes it look really nice in the logs. Be creative\! Impress me\! I'm gonna have some coffee while you work. Your pal ~EQMVII
