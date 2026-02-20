@@ -167,23 +167,40 @@ def _find_characters_in_mask(mask):
 
 LINE_Y_GAP =  8   # max vertical center difference for same line
 WORD_X_GAP = 10   # horizontal gap between chars to break a word
+ITEM_X_GAP = 40   # horizontal gap between chars to split into separate items
 
 def _group_into_lines(chars):
-    """Group character hits into lines by vertical proximity."""
+    """Group character hits into lines by vertical proximity,
+    then split lines with large horizontal gaps (different items at same height)."""
     if not chars:
         return []
     # Sort by y first
     chars = sorted(chars, key=lambda c: (c[1], c[0]))
-    lines, current = [], [chars[0]]
+    raw_lines, current = [], [chars[0]]
     for c in chars[1:]:
         prev_cy = current[-1][1] + current[-1][3] // 2
         curr_cy = c[1] + c[3] // 2
         if abs(curr_cy - prev_cy) <= LINE_Y_GAP:
             current.append(c)
         else:
-            lines.append(sorted(current, key=lambda c: c[0]))
+            raw_lines.append(sorted(current, key=lambda c: c[0]))
             current = [c]
-    lines.append(sorted(current, key=lambda c: c[0]))
+    raw_lines.append(sorted(current, key=lambda c: c[0]))
+
+    # Split lines that have large horizontal gaps (separate items at same Y)
+    lines = []
+    for line in raw_lines:
+        segment = [line[0]]
+        for c in line[1:]:
+            prev = segment[-1]
+            gap = c[0] - (prev[0] + prev[2])
+            if gap > ITEM_X_GAP:
+                lines.append(segment)
+                segment = [c]
+            else:
+                segment.append(c)
+        lines.append(segment)
+
     return lines
 
 def _line_to_text(line_chars):
@@ -354,11 +371,12 @@ KNOWN_ITEMS = [
 # Fuzzy matching
 # ───────────────────────────────────────────────────────────
 
-def _fuzzy_match(raw_text, max_dist=None):
+def _fuzzy_match(raw_text, max_ratio=0.55):
     """Best-match raw OCR text to a known item name.
 
-    Compares with spaces stripped to handle OCR fragmentation,
-    then uses a lenient distance threshold.
+    Compares with spaces stripped to handle OCR fragmentation.
+    Uses a ratio-based threshold (distance / max_length) so longer
+    item names tolerate more missing letters from template gaps.
     """
     if not raw_text or len(raw_text) < 2:
         return None
@@ -368,16 +386,15 @@ def _fuzzy_match(raw_text, max_dist=None):
     if len(raw_compact) < 2:
         return None
 
-    if max_dist is None:
-        max_dist = max(4, len(raw_compact) // 2)
-
-    best, best_d = None, max_dist + 1
+    best, best_ratio = None, max_ratio + 0.01
     for name in KNOWN_ITEMS:
         name_compact = name.replace(" ", "").lower()
         d = _levenshtein(raw_compact, name_compact)
-        if d < best_d:
-            best_d, best = d, name
-    return best if best_d <= max_dist else None
+        max_len = max(len(raw_compact), len(name_compact))
+        ratio = d / max_len if max_len > 0 else 1.0
+        if ratio < best_ratio:
+            best_ratio, best = ratio, name
+    return best if best_ratio <= max_ratio else None
 
 def _looks_like_gold(raw_text):
     """Heuristic: does this line look like 'NNN Gold'?
@@ -386,7 +403,7 @@ def _looks_like_gold(raw_text):
     These lines are kept as Item(name='Gold', classification='Normal').
     """
     compact = raw_text.replace(" ", "").lower()
-    if len(compact) < 3:
+    if len(compact) < 2:
         return False
     # Check if it ends with something close to "gold"
     tail = compact[-4:] if len(compact) >= 4 else compact
@@ -421,24 +438,24 @@ def read_items(image_path: str) -> list[Item]:
 
     items = []
     for line_chars in lines:
-        # Noise filter: need at least one word with >= 3 characters
-        wlens = _word_lengths(line_chars)
-        if not any(wl >= 3 for wl in wlens):
+        raw_text = _line_to_text(line_chars)
+        cx, cy = _line_center(line_chars)
+
+        # Gold piles: check before noise filter since "gol" is short
+        if _looks_like_gold(raw_text):
+            items.append(Item(name="Gold", classification="Normal",
+                              x=cx, y=cy))
+            continue
+
+        # Noise filter: need at least 3 total characters
+        total_chars = len(raw_text.replace(" ", ""))
+        if total_chars < 3:
             continue
 
         # Determine dominant color for this line
         color_counts = Counter(c[6] for c in line_chars)
         color = color_counts.most_common(1)[0][0]
         cls = COLOR_TO_CLASS.get(color, "Normal")
-
-        raw_text = _line_to_text(line_chars)
-        cx, cy = _line_center(line_chars)
-
-        # Gold piles: emit as "Gold" item, ignore the number prefix
-        if _looks_like_gold(raw_text):
-            items.append(Item(name="Gold", classification="Normal",
-                              x=cx, y=cy))
-            continue
 
         # Regular items: fuzzy match
         matched = _fuzzy_match(raw_text)

@@ -496,3 +496,9 @@ Don't quite ignore gold. Just read the word "Gold" and ignore the preceeding num
 ## 2026-02-20 18:15:53 UTC
 
 If blue letters and words are missing, consider we may need a better vocabulary. If you think it's necessary, I can get you extracted blue template letters. No problem.
+## 2026-02-20 18:19:03 UTC
+
+Should we stop and improve some template letters? I may be able to do that for you by just screenshotting a better chunk for any that are still problematic. Give me a list if you think it will help.
+## 2026-02-20 18:24:36 UTC
+
+run the @test_ocr.py and show me the output
