@@ -479,3 +479,20 @@ Return a concise summary of the key code patterns and the approach used.
 ## 2026-02-20 18:01:01 UTC
 
 Please proceed
+
+## 2026-02-20 18:03:33 UTC
+
+You can keep iterating. Let's ignore numbers, I don't care how much gold is on the ground and that's the only context where it will come up. I just added it to @OCR_plan.md
+
+## 2026-02-20 18:06:08 UTC
+
+lowercase j is gone. We can get a better one later if needed, but I suspect we'll do OK with it missing?
+## 2026-02-20 18:12:48 UTC
+
+I accidentally closed the window while trying to resize you. That is... embarassing. Sorry for killing you. Anyway, please proceed, you were implementing @OCR_plan.md and getting the tests to pass bit by bit, good work, yay claude
+## 2026-02-20 18:14:51 UTC
+
+Don't quite ignore gold. Just read the word "Gold" and ignore the preceeding number.
+## 2026-02-20 18:15:53 UTC
+
+If blue letters and words are missing, consider we may need a better vocabulary. If you think it's necessary, I can get you extracted blue template letters. No problem.

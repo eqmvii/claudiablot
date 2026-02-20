@@ -93,34 +93,63 @@ def _get_templates():
 
 MATCH_THRESHOLD = 0.70
 
+# Templates that are narrow/thin and prone to over-matching.
+# These are matched last and only in positions not already claimed.
+DEFERRED_CHARS = {"i", "l"}
+
 def _find_characters_in_mask(mask):
     """Slide each letter template over a binary mask, return matched chars with positions."""
     templates = _get_templates()
     if not templates:
         return []
 
+    # Split templates into primary (matched first) and deferred (matched last)
+    primary = [(c, t) for c, t in templates if c not in DEFERRED_CHARS]
+    deferred = [(c, t) for c, t in templates if c in DEFERRED_CHARS]
+
     hits = []  # (x, y, w, h, char, score)
 
-    for char, tmpl in templates:
+    for char, tmpl in primary:
         th, tw = tmpl.shape[:2]
-        # Skip if template is bigger than the mask
         if th > mask.shape[0] or tw > mask.shape[1]:
             continue
-
         result = cv2.matchTemplate(mask, tmpl, cv2.TM_CCOEFF_NORMED)
         locs = np.where(result >= MATCH_THRESHOLD)
-
         for y, x in zip(locs[0], locs[1]):
             score = float(result[y, x])
             hits.append((x, y, tw, th, char, score))
 
-    # Non-max suppression: remove overlapping detections, keep best score
-    hits.sort(key=lambda h: -h[5])  # sort by score descending
+    # Non-max suppression for primary hits
+    hits.sort(key=lambda h: -h[5])
     kept = []
     for hit in hits:
         x, y, w, h = hit[:4]
         cx, cy = x + w // 2, y + h // 2
-        # Check if this overlaps with any already-kept detection
+        overlap = False
+        for kx, ky, kw, kh, _, _ in kept:
+            kcx, kcy = kx + kw // 2, ky + kh // 2
+            if abs(cx - kcx) < max(w, kw) * 0.5 and abs(cy - kcy) < max(h, kh) * 0.5:
+                overlap = True
+                break
+        if not overlap:
+            kept.append(hit)
+
+    # Now match deferred templates, only keeping hits that don't overlap with primary
+    deferred_hits = []
+    for char, tmpl in deferred:
+        th, tw = tmpl.shape[:2]
+        if th > mask.shape[0] or tw > mask.shape[1]:
+            continue
+        result = cv2.matchTemplate(mask, tmpl, cv2.TM_CCOEFF_NORMED)
+        locs = np.where(result >= MATCH_THRESHOLD)
+        for y, x in zip(locs[0], locs[1]):
+            score = float(result[y, x])
+            deferred_hits.append((x, y, tw, th, char, score))
+
+    deferred_hits.sort(key=lambda h: -h[5])
+    for hit in deferred_hits:
+        x, y, w, h = hit[:4]
+        cx, cy = x + w // 2, y + h // 2
         overlap = False
         for kx, ky, kw, kh, _, _ in kept:
             kcx, kcy = kx + kw // 2, ky + kh // 2
@@ -304,6 +333,7 @@ KNOWN_ITEMS = [
     "Ogre Gauntlets", "Vambraces",
     "Amulet",
     # Misc
+    "Gold",
     "Jewel", "Key", "Scroll of Town Portal",
     "Scroll of Identify", "Ear",
     # Class items
@@ -325,50 +355,42 @@ KNOWN_ITEMS = [
 # ───────────────────────────────────────────────────────────
 
 def _fuzzy_match(raw_text, max_dist=None):
-    """Best-match raw OCR text to a known item name."""
+    """Best-match raw OCR text to a known item name.
+
+    Compares with spaces stripped to handle OCR fragmentation,
+    then uses a lenient distance threshold.
+    """
     if not raw_text or len(raw_text) < 2:
         return None
+
+    # Strip spaces from both sides — OCR fragments words unpredictably
+    raw_compact = raw_text.replace(" ", "").lower()
+    if len(raw_compact) < 2:
+        return None
+
     if max_dist is None:
-        max_dist = max(3, len(raw_text) // 3)
+        max_dist = max(4, len(raw_compact) // 2)
 
     best, best_d = None, max_dist + 1
-    raw_lower = raw_text.lower()
     for name in KNOWN_ITEMS:
-        d = _levenshtein(raw_lower, name.lower())
+        name_compact = name.replace(" ", "").lower()
+        d = _levenshtein(raw_compact, name_compact)
         if d < best_d:
             best_d, best = d, name
     return best if best_d <= max_dist else None
 
 def _looks_like_gold(raw_text):
-    """Heuristic: does this line look like 'NNN Gold'?"""
-    words = raw_text.split()
-    if len(words) < 2:
+    """Heuristic: does this line look like 'NNN Gold'?
+
+    Returns True if the line ends with something close to 'gold'.
+    These lines are kept as Item(name='Gold', classification='Normal').
+    """
+    compact = raw_text.replace(" ", "").lower()
+    if len(compact) < 3:
         return False
-    return _levenshtein(words[-1].lower(), "gold") <= 2
-
-def _extract_gold_name(raw_text, line_chars):
-    """Recover gold amount. We don't have digit templates yet, so use blob count."""
-    # Split chars into words
-    if not line_chars:
-        return None
-    words_chars = [[line_chars[0]]]
-    for c in line_chars[1:]:
-        prev = words_chars[-1][-1]
-        gap = c[0] - (prev[0] + prev[2])
-        if gap > WORD_X_GAP:
-            words_chars.append([c])
-        else:
-            words_chars[-1].append(c)
-
-    if len(words_chars) < 2:
-        return None
-
-    # Count characters before "Gold" word — those are digits
-    digit_count = sum(len(w) for w in words_chars[:-1])
-    if digit_count == 0:
-        return None
-
-    return "?" * digit_count + " Gold"
+    # Check if it ends with something close to "gold"
+    tail = compact[-4:] if len(compact) >= 4 else compact
+    return _levenshtein(tail, "gold") <= 2
 
 # ───────────────────────────────────────────────────────────
 # Public API
@@ -412,12 +434,10 @@ def read_items(image_path: str) -> list[Item]:
         raw_text = _line_to_text(line_chars)
         cx, cy = _line_center(line_chars)
 
-        # Gold piles
+        # Gold piles: emit as "Gold" item, ignore the number prefix
         if _looks_like_gold(raw_text):
-            gold_name = _extract_gold_name(raw_text, line_chars)
-            if gold_name:
-                items.append(Item(name=gold_name, classification="Normal",
-                                  x=cx, y=cy))
+            items.append(Item(name="Gold", classification="Normal",
+                              x=cx, y=cy))
             continue
 
         # Regular items: fuzzy match

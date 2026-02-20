@@ -38,7 +38,7 @@ CASE1_ITEMS = [
     ("Shael Rune",               "Rune"),
     ("Super Mana Potion",        "Normal"),
     ("Demonhide Sash",           "Rare"),
-    ("779 Gold",                 "Normal"),
+    ("Gold",                     "Normal"),
     ("Pilum",                    "Rare"),
 ]
 
@@ -84,14 +84,14 @@ def test_case1_rare_items(case1):
 
 CASE2_IMAGE = os.path.join(CASES_DIR, "2", "run_20260219_145645.png")
 CASE2_ITEMS = [
-    ("796 Gold",             "Normal"),
+    ("Gold",                 "Normal"),
     ("Super Healing Potion", "Normal"),
     ("Flawless Amethyst",    "Normal"),
     ("Super Mana Potion",    "Normal"),
     ("Halberd",              "Magic"),
     ("Luna",                 "Normal"),
     ("Greaves",              "Unique"),
-    ("827 Gold",             "Normal"),
+    ("Gold",                 "Normal"),
     ("Breast Plate",         "Grey"),
 ]
 
@@ -146,8 +146,8 @@ CASE3_IMAGE = os.path.join(CASES_DIR, "3", "run_20260219_182341.png")
 CASE3_ITEMS = [
     ("Super Healing Potion", "Normal"),
     ("Super Healing Potion", "Normal"),
-    ("607 Gold",             "Normal"),
-    ("871 Gold",             "Normal"),
+    ("Gold",                 "Normal"),
+    ("Gold",                 "Normal"),
     ("Super Mana Potion",    "Normal"),
     ("Assault Helmet",       "Rare"),
     ("Mask",                 "Set"),
