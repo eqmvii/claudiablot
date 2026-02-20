@@ -25,7 +25,7 @@ import mss
 import numpy as np
 import pyautogui
 
-from find_runes import find_runes
+from find_runes import find_runes_img
 
 # ---------------------------------------------------------------------------
 # Game window config.
@@ -197,7 +197,7 @@ def _write_totals(totals: dict) -> None:
 
 
 def loot_runes(run_number: int):
-    """Capture a loot screenshot, save it, and pick up any rune found."""
+    """Scan for runes and pick them up one at a time, re-scanning after each pickup."""
     pyautogui.moveTo(200, 200, duration=0.2)
     time.sleep(0.2)
 
@@ -210,24 +210,45 @@ def loot_runes(run_number: int):
         "height": LOOT_HEIGHT,
     }
 
-    with mss.mss() as sct:
-        raw = sct.grab(crop)
-        img = np.array(raw)[:, :, :3]
-
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(SCREENS_DIR, f"run_{timestamp}.png")
-    cv2.imwrite(path, img)
-    log(f"Saved loot screenshot: {path}")
 
-    hits = find_runes(path)
+    runes_picked = 0
+    first_img = None
+
+    while True:
+        with mss.mss() as sct:
+            raw = sct.grab(crop)
+            img = np.array(raw)[:, :, :3]
+
+        # Save the first frame as the run's screenshot record
+        if first_img is None:
+            first_img = img
+            cv2.imwrite(path, img)
+            log(f"Saved loot screenshot: {path}")
+
+        hits = find_runes_img(img)
+        if not hits:
+            break
+
+        # Pick up only the first hit, then re-scan
+        cx, cy = hits[0]
+        screen_x = crop["left"] + cx
+        screen_y = crop["top"]  + cy
+        log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
+        pyautogui.moveTo(screen_x, screen_y, duration=0.5)
+        time.sleep(0.2)
+        pyautogui.click()
+        time.sleep(0.5)
+        runes_picked += 1
 
     with open(RUN_LOG, "a") as f:
-        if hits:
-            f.write(f"{timestamp}  run={run_number}  RUNE x{len(hits)}\n")
+        if runes_picked:
+            f.write(f"{timestamp}  run={run_number}  RUNE x{runes_picked}\n")
         else:
             f.write(f"{timestamp}  run={run_number}  no runes\n")
 
-    if not hits:
+    if not runes_picked:
         log("No rune found.")
         os.remove(path)
         totals = _read_totals()
@@ -236,30 +257,19 @@ def loot_runes(run_number: int):
 
     found_dir = os.path.join(SCREENS_DIR, "found_runes")
     os.makedirs(found_dir, exist_ok=True)
-    cv2.imwrite(os.path.join(found_dir, f"run_{timestamp}.png"), img)
+    cv2.imwrite(os.path.join(found_dir, f"run_{timestamp}.png"), first_img)
 
     totals = _read_totals()
-    totals["total_runes_found"] += len(hits)
+    totals["total_runes_found"] += runes_picked
     _write_totals(totals)
 
-    n = len(hits)
     total = totals["total_runes_found"]
     bar = "★" + "═" * 36 + "★"
     rune_word = "rune" if total == 1 else "runes"
     print(f"\n{bar}")
-    print(f"  ✦  RUNE ACQUIRED!{'  x' + str(n) if n > 1 else ''}  ✦")
+    print(f"  ✦  RUNE ACQUIRED!{'  x' + str(runes_picked) if runes_picked > 1 else ''}  ✦")
     print(f"  run {run_number}  ·  all-time total: {total} {rune_word}")
     print(f"{bar}\n")
-
-    for cx, cy in hits:
-        # Crop-local coords → absolute screen coords
-        screen_x = crop["left"] + cx
-        screen_y = crop["top"]  + cy
-        log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
-        pyautogui.moveTo(screen_x, screen_y, duration=0.5)
-        time.sleep(0.2)
-        pyautogui.click()
-        time.sleep(0.5)
 
 
 def exit_game():

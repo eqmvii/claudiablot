@@ -61,27 +61,10 @@ def _get_template():
     return _TEMPLATE, _MASK
 
 
-def find_runes(image_path: str, threshold: float = THRESHOLD) -> list[tuple[int, int]]:
-    """
-    Scan a single screenshot for the word "Rune".
-
-    Parameters
-    ----------
-    image_path : str
-        Path to a PNG screenshot.
-    threshold : float
-        Minimum match score (0–1).  Default 0.75.
-
-    Returns
-    -------
-    list of (cx, cy) tuples — centre pixel of each match in image coordinates.
-    """
+def _find_runes_core(img: np.ndarray, threshold: float = THRESHOLD) -> list[tuple[int, int]]:
+    """Core detection on an already-loaded BGR image array."""
     tmpl, mask = _get_template()
     th, tw = tmpl.shape[:2]
-
-    img = cv2.imread(image_path)
-    if img is None:
-        raise FileNotFoundError(f"Cannot load image: {image_path}")
 
     # Skip images that are smaller than the template
     if img.shape[0] < th or img.shape[1] < tw:
@@ -110,6 +93,35 @@ def find_runes(image_path: str, threshold: float = THRESHOLD) -> list[tuple[int,
 
     # Convert top-left corners → centres
     return [(x + tw // 2, y + th // 2) for x, y in kept]
+
+
+def find_runes(image_path: str, threshold: float = THRESHOLD) -> list[tuple[int, int]]:
+    """
+    Scan a single screenshot for the word "Rune".
+
+    Parameters
+    ----------
+    image_path : str
+        Path to a PNG screenshot.
+    threshold : float
+        Minimum match score (0–1).  Default 0.75.
+
+    Returns
+    -------
+    list of (cx, cy) tuples — centre pixel of each match in image coordinates.
+    """
+    img = cv2.imread(image_path)
+    if img is None:
+        raise FileNotFoundError(f"Cannot load image: {image_path}")
+    return _find_runes_core(img, threshold)
+
+
+def find_runes_img(img: np.ndarray, threshold: float = THRESHOLD) -> list[tuple[int, int]]:
+    """
+    Scan an already-loaded BGR numpy array for the word "Rune".
+    Same as find_runes() but skips the disk read.
+    """
+    return _find_runes_core(img, threshold)
 
 
 def scan_directory(root: str = SAMPLES_DIR, threshold: float = THRESHOLD) -> None:
