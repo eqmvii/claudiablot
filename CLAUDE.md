@@ -4,7 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Purpose
 
-This project is a single-player Diablo II Pindleskin farming bot driven by Claude Code. "Pindleskin" is a boss in Diablo II Act V accessible via the Anya portal in Harrogath, commonly farmed for high-quality item drops.
+This project is a single-player Diablo II Resurrected Pindleskin farming bot. "Pindleskin" is a boss in Diablo II Act V accessible via the Anya portal in Harrogath, commonly farmed for high-quality item drops.
+
+## Diablo Item Color Information for OCR
+
+Diablo items text can have following colors:
+
+Normal (White)
+Magic (Blue)
+Rare (Yellow)
+Unique (Gold)
+Set (Green)
+Grey (Grey)
+Rune (Orange)
+
+A note on grey: these are either socketed or ethereal. We'll just call them Grey, since we can't tell while the item is on the ground.
 
 ## Message Logging (REQUIRED)
 
