@@ -445,3 +445,15 @@ Run the tests, and if it doesn't exist, stub read_items and make it return some 
 ## 
 
 Is there a simple way you can make the bot interuptable? Say, cancel the python script if I manually move the mouse west of the 100 pixel mark (an area the bot will never touch) or something? Not sure if that's tricky due to threads or listeners or whatever in python land, I'm more familiar with JS\!
+
+## 
+
+Use vision to look in @screens_from_runs/ and find me a screenshot with the word "charm" in it. It will be blue, either Small Charm, Large Charm, or Grand Charm.
+
+## 
+
+found it - run_20260219_163727 - just used my eyes. Clean up any code you wrote to try and find it, we don't need it anymore.
+
+## 
+
+I would like to pick up charms as well as runes now. I have added @templates/words/Charm.png - please edit the code to look for and pick up charms just like it does runes. Ensure we keep the "find something to pick - pick it - scan again" logic we added earlier for the possibility of multiple runes dropping, since it could sometimes be a mix of runes and charms. And please also make a separate testable side script just like we did in @test_rune_pickup.py so I can test a charm pickup without having to wait for one to drop naturally. GO!

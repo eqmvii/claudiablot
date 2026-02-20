@@ -26,6 +26,7 @@ import mss
 import numpy as np
 import pyautogui
 
+from find_charms import find_charms_img
 from find_runes import find_runes_img
 
 # ---------------------------------------------------------------------------
@@ -219,7 +220,7 @@ def kill_pindleskin():
 
 
 def _read_totals() -> dict:
-    totals = {"total_runes_found": 0, "mal_plus_runes_found": 0}
+    totals = {"total_runes_found": 0, "mal_plus_runes_found": 0, "total_charms_found": 0}
     try:
         with open(TOTALS_FILE) as f:
             for line in f:
@@ -237,8 +238,8 @@ def _write_totals(totals: dict) -> None:
             f.write(f"{key}={val}\n")
 
 
-def loot_runes(run_number: int):
-    """Scan for runes and pick them up one at a time, re-scanning after each pickup."""
+def loot_items(run_number: int):
+    """Scan for runes and charms, picking up one at a time and re-scanning after each."""
     pyautogui.moveTo(200, 200, duration=0.2)
     time.sleep(0.2)
 
@@ -254,8 +255,9 @@ def loot_runes(run_number: int):
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     path = os.path.join(SCREENS_DIR, f"run_{timestamp}.png")
 
-    runes_picked = 0
-    first_img = None
+    runes_picked  = 0
+    charms_picked = 0
+    first_img     = None
 
     while True:
         with mss.mss() as sct:
@@ -268,33 +270,53 @@ def loot_runes(run_number: int):
             cv2.imwrite(path, img)
             log(f"Saved loot screenshot: {path}")
 
-        hits = find_runes_img(img)
-        if not hits:
+        # Check runes first, then charms
+        rune_hits  = find_runes_img(img)
+        charm_hits = find_charms_img(img)
+
+        if rune_hits:
+            cx, cy = rune_hits[0]
+            kind = "Rune"
+        elif charm_hits:
+            cx, cy = charm_hits[0]
+            kind = "Charm"
+        else:
             break
 
-        # Pick up only the first hit, then re-scan
-        cx, cy = hits[0]
         screen_x = crop["left"] + cx
         screen_y = crop["top"]  + cy
-        log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
+        log(f"{kind} at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
         check_abort()
         pyautogui.moveTo(screen_x, screen_y, duration=0.5)
         safe_sleep(0.2)
         pyautogui.click()
         safe_sleep(0.5)
-        runes_picked += 1
+
+        if kind == "Rune":
+            runes_picked += 1
+        else:
+            charms_picked += 1
+
+    total_picked = runes_picked + charms_picked
+
+    # Build log line
+    if total_picked:
+        parts = []
+        if runes_picked:  parts.append(f"RUNE x{runes_picked}")
+        if charms_picked: parts.append(f"CHARM x{charms_picked}")
+        log_line = "  +  ".join(parts)
+    else:
+        log_line = "no items"
 
     with open(RUN_LOG, "a") as f:
-        if runes_picked:
-            f.write(f"{timestamp}  run={run_number}  RUNE x{runes_picked}\n")
-        else:
-            f.write(f"{timestamp}  run={run_number}  no runes\n")
+        f.write(f"{timestamp}  run={run_number}  {log_line}\n")
 
-    if not runes_picked:
-        log("No rune found.")
+    if not total_picked:
+        log("No items found.")
         os.remove(path)
         totals = _read_totals()
-        print(f"{timestamp}  run={run_number:>4}  ·  no runes  (all-time: {totals['total_runes_found']})")
+        print(f"{timestamp}  run={run_number:>4}  ·  no items  "
+              f"(runes: {totals['total_runes_found']}  charms: {totals['total_charms_found']})")
         return
 
     found_dir = os.path.join(SCREENS_DIR, "found_runes")
@@ -302,15 +324,23 @@ def loot_runes(run_number: int):
     cv2.imwrite(os.path.join(found_dir, f"run_{timestamp}.png"), first_img)
 
     totals = _read_totals()
-    totals["total_runes_found"] += runes_picked
+    totals["total_runes_found"]  += runes_picked
+    totals["total_charms_found"] += charms_picked
     _write_totals(totals)
 
-    total = totals["total_runes_found"]
+    # Build pickup summary for the console
+    parts = []
+    if runes_picked:
+        parts.append(f"RUNE{'  x' + str(runes_picked) if runes_picked > 1 else ''}")
+    if charms_picked:
+        parts.append(f"CHARM{'  x' + str(charms_picked) if charms_picked > 1 else ''}")
+    pickup_str = "  +  ".join(parts)
+
     bar = "★" + "═" * 36 + "★"
-    rune_word = "rune" if total == 1 else "runes"
     print(f"\n{bar}")
-    print(f"  ✦  RUNE ACQUIRED!{'  x' + str(runes_picked) if runes_picked > 1 else ''}  ✦")
-    print(f"  run {run_number}  ·  all-time total: {total} {rune_word}")
+    print(f"  ✦  {pickup_str} ACQUIRED!  ✦")
+    print(f"  run {run_number}  ·  "
+          f"{totals['total_runes_found']} runes  ·  {totals['total_charms_found']} charms  all-time")
     print(f"{bar}\n")
 
 
@@ -367,7 +397,7 @@ def run_once(run_number: int):
 
     kill_pindleskin()
 
-    loot_runes(run_number)
+    loot_items(run_number)
 
     log("Waiting before next game...")
     safe_sleep(0.5)
