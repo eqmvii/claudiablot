@@ -304,7 +304,7 @@ def run_once(run_number: int):
     loot_runes(run_number)
 
     log("Waiting before next game...")
-    time.sleep(2)
+    time.sleep(0.5)
 
     exit_game()
 
