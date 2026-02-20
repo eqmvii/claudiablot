@@ -1,3 +1,10 @@
+## Updates after work began
+
+- Do not worry about numbers. They always preceed "gold" and I don't care about gold. 
+
+
+## Original Doc
+
 Implement screen reading for a loot screenshot. 
 
 This will get incoroporated into the bot, for now you have tests to work with. 
