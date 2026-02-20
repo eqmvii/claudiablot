@@ -18,9 +18,26 @@ import glob
 import numpy as np
 import os
 
-TEMPLATE_PATH = os.path.join(os.path.dirname(__file__), "templates", "words", "Rune.png")
-SAMPLES_DIR   = os.path.join(os.path.dirname(__file__), "samples")
-THRESHOLD     = 0.75  # match score below which we ignore results
+TEMPLATE_PATH  = os.path.join(os.path.dirname(__file__), "templates", "words", "Rune.png")
+SAMPLES_DIR    = os.path.join(os.path.dirname(__file__), "samples")
+THRESHOLD      = 0.75  # match score below which we ignore results
+
+# HSV bounds for rune-orange — must match the template mask range.
+_ORANGE_LO = np.array([ 5, 120,  80])
+_ORANGE_HI = np.array([25, 255, 255])
+# Fraction of masked pixels in the matched crop that must be orange.
+_MIN_ORANGE_FRACTION = 0.60
+
+
+def _is_orange_enough(crop: np.ndarray, mask: np.ndarray) -> bool:
+    """Return True if enough of the mask pixels in *crop* are rune-orange."""
+    hsv         = cv2.cvtColor(crop, cv2.COLOR_BGR2HSV)
+    orange_pix  = cv2.inRange(hsv, _ORANGE_LO, _ORANGE_HI)
+    mask_count  = int(np.count_nonzero(mask))
+    if mask_count == 0:
+        return False
+    overlap     = int(np.count_nonzero(orange_pix & mask))
+    return (overlap / mask_count) >= _MIN_ORANGE_FRACTION
 
 
 def _load_template():
@@ -86,6 +103,10 @@ def find_runes(image_path: str, threshold: float = THRESHOLD) -> list[tuple[int,
         if not any(abs(x - kx) < min_dist and abs(y - ky) < min_dist
                    for kx, ky in kept):
             kept.append((x, y))
+
+    # Reject matches whose pixels aren't actually rune-orange
+    kept = [(x, y) for x, y in kept
+            if _is_orange_enough(img[y:y+th, x:x+tw], mask)]
 
     # Convert top-left corners → centres
     return [(x + tw // 2, y + th // 2) for x, y in kept]

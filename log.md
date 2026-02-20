@@ -413,3 +413,11 @@ add something that counts total runs. keep it simple, we can count from 0 starti
 ## 2026-02-19 20:47:22 UTC
 
 If I stop the bot and then start it again, will run number be lost? I would like a running total, may need to be written in a file somewhere somehow.
+
+## 2026-02-19 20:52:00 UTC
+
+I found the bot picked up a yellow Rune Bow and a blue Rune Scepter. Funny! Can you add a check to ensure after finding the template, that it's very, very close to the orange of the template and not something else (yellow, white, blue, grey, etc.)?
+
+## 2026-02-20 00:46:00 UTC
+
+We can test it because we keep screenshots! Test everything in the screens_from_runs/found_runes folder with the new code and see which you think are Runes and which are other items with the word Rune in them. What fun!
