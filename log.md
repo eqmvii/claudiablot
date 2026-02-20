@@ -433,3 +433,11 @@ Let's also keep two more long-running tallies: (1) total runes found, currently 
 ## 
 
 morning claude. Let's change the main logging in @bot.py - the one line that logs even when debug is off - to also list total runes found. Let's also change "runes_found=NUMBER" to be a little more human readable, just say "No runes" or else print with extra new lines and PAZAZ "RUNE ACQUIRED" or something that makes it look really nice in the logs. Be creative\! Impress me\! I'm gonna have some coffee while you work. Your pal ~EQMVII
+
+## 
+
+We're going to write some tests for OCR. These will all fail, but having them will help the next OCR steps (yey TDD). You'll find stub markdown files and images in @test_cases/ . For each test case, I want a series of tests that confirm our to-be-written OCR module identifies the correct number of items, gets the item name right, and gets the item classification right (see item type/color info I added to Claude.md). Go forth and write tests\!
+
+## 
+
+Run the tests, and if it doesn't exist, stub read_items and make it return some empty data structure or something so I can see the tests running and failing, not blowing up for missing module
