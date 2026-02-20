@@ -17,6 +17,7 @@ One-time setup required before running:
 
 import os
 import sys
+import threading
 import time
 from datetime import datetime
 
@@ -96,9 +97,21 @@ class AbortBot(Exception):
     """Raised when the user moves the mouse into the abort zone (x < ABORT_ZONE_X)."""
 
 
+_abort_flag = threading.Event()
+
+
+def _mouse_monitor():
+    """Background thread: sets _abort_flag the moment the mouse enters the abort zone."""
+    while not _abort_flag.is_set():
+        if pyautogui.position().x < ABORT_ZONE_X:
+            _abort_flag.set()
+            return
+        time.sleep(0.05)   # 20 checks/second — responsive but not spammy
+
+
 def check_abort():
-    """Raise AbortBot if the mouse is in the abort zone."""
-    if pyautogui.position().x < ABORT_ZONE_X:
+    """Raise AbortBot if the abort flag has been set."""
+    if _abort_flag.is_set():
         raise AbortBot("Mouse moved into abort zone — stopping bot.")
 
 
@@ -158,6 +171,7 @@ def walk_to_portal():
     safe_sleep(1)
     for i, (x, y, delay) in enumerate(PORTAL_WALK_PATH, 1):
         log(f"  Waypoint {i}/{len(PORTAL_WALK_PATH)}: ({x}, {y}) — waiting {delay}s")
+        check_abort()
         pyautogui.moveTo(x, y, duration=0.3)
         safe_sleep(0.2)
         pyautogui.click()
@@ -170,6 +184,7 @@ def blade_warp_to_pindleskin():
     log(f"Blade Warping to Pindleskin ({len(BLADE_WARP_PATH)} warps)...")
     for i, (x, y, move_dur, delay) in enumerate(BLADE_WARP_PATH, 1):
         log(f"  Warp {i}/{len(BLADE_WARP_PATH)}: ({x}, {y})")
+        check_abort()
         pyautogui.moveTo(x, y, duration=move_dur)
         pyautogui.press("s")
         safe_sleep(delay)
@@ -179,6 +194,7 @@ def blade_warp_to_pindleskin():
 def kill_pindleskin():
     """Fight Pindleskin: cast weakness sigil then alternate Abyss and Miasma Bolt."""
     log("Engaging Pindleskin...")
+    check_abort()
     pyautogui.moveTo(1047, 536, duration=0.3)
 
     # Cast lethargy sigil
@@ -261,6 +277,7 @@ def loot_runes(run_number: int):
         screen_x = crop["left"] + cx
         screen_y = crop["top"]  + cy
         log(f"Rune at crop ({cx}, {cy}) → screen ({screen_x}, {screen_y}) — picking up!")
+        check_abort()
         pyautogui.moveTo(screen_x, screen_y, duration=0.5)
         safe_sleep(0.2)
         pyautogui.click()
@@ -368,6 +385,7 @@ def _load_run_count() -> int:
 
 def main():
     print(f"Bot starting — move mouse left of x={ABORT_ZONE_X} at any time to stop.")
+    threading.Thread(target=_mouse_monitor, daemon=True).start()
     time.sleep(2)
 
     run_number = _load_run_count() + 1
