@@ -1,0 +1,1 @@
+2026-02-20 11% resetting at 1pm, 30% weekly. switching to opus.
