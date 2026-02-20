@@ -457,3 +457,7 @@ found it - run_20260219_163727 - just used my eyes. Clean up any code you wrote 
 ## 
 
 I would like to pick up charms as well as runes now. I have added @templates/words/Charm.png - please edit the code to look for and pick up charms just like it does runes. Ensure we keep the "find something to pick - pick it - scan again" logic we added earlier for the possibility of multiple runes dropping, since it could sometimes be a mix of runes and charms. And please also make a separate testable side script just like we did in @test_rune_pickup.py so I can test a charm pickup without having to wait for one to drop naturally. GO!
+
+## 
+
+Process all the new word images in @samples/Words/ to fill in missing template letters in @templates/letters/ . Once done I think we'll have all the lowercase letters but q, which will unlock the big OCR step\!
