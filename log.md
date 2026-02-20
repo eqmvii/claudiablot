@@ -502,3 +502,9 @@ Should we stop and improve some template letters? I may be able to do that for y
 ## 2026-02-20 18:24:36 UTC
 
 run the @test_ocr.py and show me the output
+## 2026-02-20 18:28:09 UTC
+
+I've added a 4th testcase in @test_cases/4/ . Please write tests for it.
+## 2026-02-20 18:30:51 UTC
+
+Alright, now let's wire this up to the bot in a way that will let me test it. Before the rune/charm pickup logic in bot.py please OCR the screen and print the items you think you see to the console. I'll watch for a while and look for any obvious gaps. Condition that specific print on a new variable called debug_ocr or something.

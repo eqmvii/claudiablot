@@ -191,3 +191,66 @@ def test_case3_duplicate_healing_potions(case3):
     healers = [item for item in case3 if item.name == "Super Healing Potion"]
     assert len(healers) == 2
     assert all(item.classification == "Normal" for item in healers)
+
+
+# ---------------------------------------------------------------------------
+# Case 4 — run_20260219_160312.png
+#
+# 6 items: 3× Normal healing potions, 1 Unique weapon, 1 Magic weapon,
+#          1 Rare claw.
+# ---------------------------------------------------------------------------
+
+CASE4_IMAGE = os.path.join(CASES_DIR, "4", "run_20260219_160312.png")
+CASE4_ITEMS = [
+    ("Double Axe",           "Unique"),
+    ("Super Healing Potion", "Normal"),
+    ("Super Healing Potion", "Normal"),
+    ("Spetum",               "Magic"),
+    ("Feral Claws",          "Rare"),
+    ("Super Healing Potion", "Normal"),
+]
+
+
+@pytest.fixture(scope="module")
+def case4():
+    return read_items(CASE4_IMAGE)
+
+
+def test_case4_item_count(case4):
+    assert len(case4) == len(CASE4_ITEMS)
+
+
+def test_case4_item_names(case4):
+    expected = Counter(name for name, _ in CASE4_ITEMS)
+    actual   = Counter(item.name for item in case4)
+    assert actual == expected
+
+
+def test_case4_item_classifications(case4):
+    expected = Counter(cls for _, cls in CASE4_ITEMS)
+    actual   = Counter(item.classification for item in case4)
+    assert actual == expected
+
+
+def test_case4_unique_item(case4):
+    uniques = [item for item in case4 if item.classification == "Unique"]
+    assert len(uniques) == 1
+    assert uniques[0].name == "Double Axe"
+
+
+def test_case4_magic_item(case4):
+    magic = [item for item in case4 if item.classification == "Magic"]
+    assert len(magic) == 1
+    assert magic[0].name == "Spetum"
+
+
+def test_case4_rare_item(case4):
+    rares = [item for item in case4 if item.classification == "Rare"]
+    assert len(rares) == 1
+    assert rares[0].name == "Feral Claws"
+
+
+def test_case4_triple_healing_potions(case4):
+    healers = [item for item in case4 if item.name == "Super Healing Potion"]
+    assert len(healers) == 3
+    assert all(item.classification == "Normal" for item in healers)

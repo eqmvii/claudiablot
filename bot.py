@@ -28,6 +28,7 @@ import pyautogui
 
 from find_charms import find_charms_img
 from find_runes import find_runes_img
+from ocr_items import read_items
 
 # ---------------------------------------------------------------------------
 # Game window config.
@@ -41,6 +42,9 @@ GAME_H = 1050
 
 # Set to True to print step-by-step progress to the console.
 VERBOSE = False
+
+# Set to True to print OCR-detected items each run for debugging.
+DEBUG_OCR = True
 
 # Template match threshold (0-1). Lower = more lenient.
 MATCH_THRESHOLD = 0.8
@@ -269,6 +273,13 @@ def loot_items(run_number: int):
             first_img = img
             cv2.imwrite(path, img)
             log(f"Saved loot screenshot: {path}")
+
+            if DEBUG_OCR:
+                ocr_items = read_items(path)
+                if ocr_items:
+                    print(f"  [OCR] {', '.join(f'{it.name} ({it.classification})' for it in ocr_items)}")
+                else:
+                    print("  [OCR] no items detected")
 
         # Check runes first, then charms
         rune_hits  = find_runes_img(img)
