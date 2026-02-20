@@ -8,7 +8,9 @@ Close, just need my usage back.
 
 2. Eric gets word samples with missing lowercase letters
 
-c, f, j, k, m, q, v, x
+f, m, v, c, j,
+
+   k,  q,  x
 
 3. We talk through the algorithim and do the thing
 
