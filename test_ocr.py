@@ -254,3 +254,62 @@ def test_case4_triple_healing_potions(case4):
     healers = [item for item in case4 if item.name == "Super Healing Potion"]
     assert len(healers) == 3
     assert all(item.classification == "Normal" for item in healers)
+
+
+# ---------------------------------------------------------------------------
+# Case 5 — loot_20260220_133550.png
+#
+# 7 items: 2× Normal healing potions, 2× Normal mana potions,
+#          1 Rare gloves, 1 Magic weapon, 1 Normal weapon.
+# ---------------------------------------------------------------------------
+
+CASE5_IMAGE = os.path.join(CASES_DIR, "5", "loot_20260220_133550.png")
+CASE5_ITEMS = [
+    ("Super Healing Potion", "Normal"),
+    ("Super Healing Potion", "Normal"),
+    ("Super Mana Potion",    "Normal"),
+    ("Super Mana Potion",    "Normal"),
+    ("Bramble Mitts",        "Rare"),
+    ("Mithril Point",        "Magic"),
+    ("Rune Sword",           "Normal"),
+]
+
+
+@pytest.fixture(scope="module")
+def case5():
+    return read_items(CASE5_IMAGE)
+
+
+def test_case5_item_count(case5):
+    assert len(case5) == len(CASE5_ITEMS)
+
+
+def test_case5_item_names(case5):
+    expected = Counter(name for name, _ in CASE5_ITEMS)
+    actual   = Counter(item.name for item in case5)
+    assert actual == expected
+
+
+def test_case5_item_classifications(case5):
+    expected = Counter(cls for _, cls in CASE5_ITEMS)
+    actual   = Counter(item.classification for item in case5)
+    assert actual == expected
+
+
+def test_case5_rare_item(case5):
+    rares = [item for item in case5 if item.classification == "Rare"]
+    assert len(rares) == 1
+    assert rares[0].name == "Bramble Mitts"
+
+
+def test_case5_magic_item(case5):
+    magic = [item for item in case5 if item.classification == "Magic"]
+    assert len(magic) == 1
+    assert magic[0].name == "Mithril Point"
+
+
+def test_case5_normal_weapon(case5):
+    normals = [item for item in case5 if item.classification == "Normal"
+               and "Potion" not in item.name]
+    assert len(normals) == 1
+    assert normals[0].name == "Rune Sword"

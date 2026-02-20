@@ -508,3 +508,9 @@ I've added a 4th testcase in @test_cases/4/ . Please write tests for it.
 ## 2026-02-20 18:30:51 UTC
 
 Alright, now let's wire this up to the bot in a way that will let me test it. Before the rune/charm pickup logic in bot.py please OCR the screen and print the items you think you see to the console. I'll watch for a while and look for any obvious gaps. Condition that specific print on a new variable called debug_ocr or something.
+## 2026-02-20 18:39:25 UTC
+
+Added @test_cases/5/ with another test case I saw many fails on. In particular, it got item names wrong. Write tests for it, run the tests, and see if you see the same failures I did. One concern I have is your item list - it was odd you had to add to it earlier. Where did it come from? I added @item_names.txt to the repo which I copied from my old reference repo, perhaps you should use or incorporate that file. Go!
+## 2026-02-20 18:52:56 UTC
+
+Let's stop this chain. I'm running out of plan usage.

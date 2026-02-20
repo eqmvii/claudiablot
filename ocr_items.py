@@ -263,138 +263,93 @@ def _levenshtein(s1, s2):
     return prev[-1]
 
 # ───────────────────────────────────────────────────────────
-# Known D2 item names
+# Known D2 item names — loaded from item_names.txt plus extras
 # ───────────────────────────────────────────────────────────
 
-KNOWN_ITEMS = [
-    # Potions
-    "Super Mana Potion", "Super Healing Potion",
-    "Full Rejuvination Potion", "Rejuvenation Potion",
-    "Greater Mana Potion", "Greater Healing Potion",
-    "Mana Potion", "Healing Potion",
-    "Minor Mana Potion", "Minor Healing Potion",
-    "Light Mana Potion", "Light Healing Potion",
-    # Gems
-    "Chipped Topaz", "Chipped Amethyst", "Chipped Sapphire",
-    "Chipped Ruby", "Chipped Emerald", "Chipped Diamond",
-    "Flawed Topaz", "Flawed Amethyst", "Flawed Sapphire",
-    "Flawed Ruby", "Flawed Emerald", "Flawed Diamond",
-    "Topaz", "Amethyst", "Sapphire", "Ruby", "Emerald", "Diamond",
-    "Flawless Topaz", "Flawless Amethyst", "Flawless Sapphire",
-    "Flawless Ruby", "Flawless Emerald", "Flawless Diamond",
-    "Perfect Topaz", "Perfect Amethyst", "Perfect Sapphire",
-    "Perfect Ruby", "Perfect Emerald", "Perfect Diamond",
-    # Runes
-    "El Rune", "Eld Rune", "Tir Rune", "Nef Rune", "Eth Rune",
-    "Ith Rune", "Tal Rune", "Ral Rune", "Ort Rune", "Thul Rune",
-    "Amn Rune", "Sol Rune", "Shael Rune", "Dol Rune", "Hel Rune",
-    "Io Rune", "Lum Rune", "Ko Rune", "Fal Rune", "Lem Rune",
-    "Pul Rune", "Um Rune", "Mal Rune", "Ist Rune", "Gul Rune",
-    "Vex Rune", "Ohm Rune", "Lo Rune", "Sur Rune", "Ber Rune",
-    "Jah Rune", "Cham Rune", "Zod Rune",
-    # Weapons
-    "Pilum", "Halberd", "Claymore", "Scimitar", "Javelin",
-    "Short War Bow", "Military Pick", "War Sword", "Battle Axe",
-    "Gothic Axe", "Glaive", "Double Bow", "Stiletto", "Knife",
-    "Giant Thresher", "Thresher", "Colossus Blade", "Berserker Axe",
-    "Cryptic Sword", "Phase Blade", "Hydra Bow", "Unearthed Wand",
-    "Ataghan", "Conquest Sword", "Bec-de-Corbin", "War Pike",
-    "Lance", "Pike", "Voulge", "Poleaxe", "Bardiche", "Partizan",
-    "Spear", "Spetum", "Trident", "Brandistock", "War Fork",
-    "Short Sword", "Long Sword", "Broad Sword", "Bastard Sword",
-    "Flamberge", "Great Sword", "Zweihander",
-    "Hand Axe", "Axe", "Double Axe", "Cleaver",
-    "Large Axe", "Broad Axe", "Giant Axe", "Executioner Sword",
-    "Dagger", "Dirk", "Kris", "Blade",
-    "Short Bow", "Long Bow", "Composite Bow", "Short Battle Bow",
-    "Long Battle Bow", "Short War Bow", "Long War Bow",
-    "Scepter", "Grand Scepter", "War Scepter",
-    "Staff", "Long Staff", "Gnarled Staff", "Battle Staff", "War Staff",
-    "Wand", "Yew Wand", "Bone Wand", "Grim Wand",
-    "Mace", "Morning Star", "Flail", "War Hammer", "Maul",
-    "Great Maul", "Club", "Spiked Club",
-    "Luna", "Truncheon", "Mighty Scepter",
-    "Scissors Katar", "Suwayyah", "Wrist Sword", "Feral Claws",
-    "Balanced Knife", "Balanced Axe",
-    "Hyperion Javelin", "Stygian Pilum", "Matriarchal Javelin",
-    "Superior Cestus",
-    # Armor / Helms / Shields / Belts / Boots / Gloves
-    "Demonhide Sash", "Greaves", "Breast Plate", "Assault Helmet",
-    "Mask", "Heraldic Shield", "Ring", "Ornate Plate",
-    "Scale Mail", "Chain Mail", "Fanged Helm", "Heavy Belt",
-    "Heavy Boots", "Light Plate", "Gothic Shield",
-    "Serpentskin Armor", "Archon Plate", "Dusk Shroud",
-    "Wyrmhide", "Scarab Husk", "Wire Fleece", "Diamond Mail",
-    "Loricated Mail", "Great Hauberk", "Boneweave",
-    "Lacquered Plate", "Shadow Plate", "Sacred Armor",
-    "Quilted Armor", "Leather Armor", "Hard Leather Armor",
-    "Studded Leather", "Ring Mail", "Splint Mail",
-    "Plate Mail", "Field Plate", "Gothic Plate", "Full Plate Mail",
-    "Ancient Armor",
-    "Cap", "Skull Cap", "Helm", "Full Helm", "Great Helm",
-    "Crown", "Bone Helm", "War Hat", "Sallet", "Casque",
-    "Basinet", "Winged Helm", "Grand Crown", "Death Mask",
-    "Bone Visage", "Demonhead", "Corona", "Tiara", "Diadem",
-    "Circlet",
-    "Buckler", "Small Shield", "Large Shield", "Kite Shield",
-    "Tower Shield", "Bone Shield", "Spiked Shield",
-    "Monarch", "Ward", "Aegis", "Troll Nest",
-    "Sash", "Light Belt", "Belt", "Heavy Belt", "Plated Belt",
-    "War Belt", "Mithril Coil", "Troll Belt", "Colossus Girdle",
-    "Vampirefang Belt", "Spiderweb Sash",
-    "Boots", "Heavy Boots", "Chain Boots", "Light Plated Boots",
-    "Greaves", "Mirrored Boots", "War Boots",
-    "Scarabshell Boots", "Boneweave Boots", "Myrmidon Greaves",
-    "Leather Gloves", "Heavy Gloves", "Chain Gloves",
-    "Light Gauntlets", "Gauntlets", "War Gauntlets",
-    "Ogre Gauntlets", "Vambraces",
-    "Amulet",
-    # Misc
-    "Gold",
-    "Jewel", "Key", "Scroll of Town Portal",
-    "Scroll of Identify", "Ear",
-    # Class items
-    "Shrunken Head", "Preserved Head",
-    "Hawk Helm", "Antlers", "Falcon Mask", "Spirit Mask",
-    "Jawbone Cap", "Jawbone Visor", "Fanged Helm",
-    "Horned Helm", "Assault Helmet", "Avenger Guard",
-    "Barbed Shield", "Rondache", "Heraldic Shield",
-    "Aerin Shield", "Crown Shield", "Akaran Targe",
-    "Akaran Rondache", "Protector Shield", "Gilded Shield",
-    "Royal Shield", "Sacred Targe", "Sacred Rondache",
-    "Kurast Shield", "Zakarum Shield", "Vortex Shield",
-    # Charms
-    "Small Charm", "Large Charm", "Grand Charm",
-]
+def _load_item_names():
+    """Load known item names from item_names.txt, plus a few extras."""
+    names = []
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "item_names.txt")
+    try:
+        with open(path) as f:
+            for line in f:
+                name = line.strip()
+                if name:
+                    names.append(name)
+    except FileNotFoundError:
+        pass
+    # Items not in the reference file
+    extras = [
+        "Gold", "Key", "Ear", "Knife", "Staff",
+        "Full Rejuvination Potion", "Rejuvenation Potion",
+        "Minor Mana Potion", "Minor Healing Potion",
+        "Light Mana Potion", "Light Healing Potion",
+        "Shrunken Head", "Bec-de-Corbin",
+    ]
+    seen = set(names)
+    for e in extras:
+        if e not in seen:
+            names.append(e)
+    return names
+
+KNOWN_ITEMS = _load_item_names()
 
 # ───────────────────────────────────────────────────────────
 # Fuzzy matching
 # ───────────────────────────────────────────────────────────
 
-def _fuzzy_match(raw_text, max_ratio=0.55):
+def _lcs_length(s1, s2):
+    """Length of the longest common subsequence (space-optimized DP)."""
+    m, n = len(s1), len(s2)
+    if m == 0 or n == 0:
+        return 0
+    prev = [0] * (n + 1)
+    for i in range(1, m + 1):
+        curr = [0] * (n + 1)
+        for j in range(1, n + 1):
+            if s1[i - 1] == s2[j - 1]:
+                curr[j] = prev[j - 1] + 1
+            else:
+                curr[j] = max(prev[j], curr[j - 1])
+        prev = curr
+    return prev[n]
+
+
+def _fuzzy_match(raw_text, min_score=0.45):
     """Best-match raw OCR text to a known item name.
 
-    Compares with spaces stripped to handle OCR fragmentation.
-    Uses a ratio-based threshold (distance / max_length) so longer
-    item names tolerate more missing letters from template gaps.
+    Uses LCS-based Dice coefficient as the primary metric:
+        score = 2 * lcs_length / (len_raw + len_name)
+    This naturally handles both truncated OCR (missing letters) and
+    overlong candidates without biasing toward short or long names.
+    Ties broken by edit distance (lower = better).
     """
     if not raw_text or len(raw_text) < 2:
         return None
 
-    # Strip spaces from both sides — OCR fragments words unpredictably
     raw_compact = raw_text.replace(" ", "").lower()
     if len(raw_compact) < 2:
         return None
 
-    best, best_ratio = None, max_ratio + 0.01
+    best = None
+    best_score = min_score - 0.01
+    best_lcs = 0
+
     for name in KNOWN_ITEMS:
         name_compact = name.replace(" ", "").lower()
-        d = _levenshtein(raw_compact, name_compact)
-        max_len = max(len(raw_compact), len(name_compact))
-        ratio = d / max_len if max_len > 0 else 1.0
-        if ratio < best_ratio:
-            best_ratio, best = ratio, name
-    return best if best_ratio <= max_ratio else None
+        lcs = _lcs_length(raw_compact, name_compact)
+        total_len = len(raw_compact) + len(name_compact)
+        score = 2 * lcs / total_len if total_len > 0 else 0
+        if score < min_score:
+            continue
+        # Primary: highest Dice score. Tiebreak: highest raw LCS count
+        # (prefer the candidate that explains more of the raw text).
+        if score > best_score or (score == best_score and lcs > best_lcs):
+            best_score = score
+            best_lcs = lcs
+            best = name
+
+    return best
 
 def _looks_like_gold(raw_text):
     """Heuristic: does this line look like 'NNN Gold'?
