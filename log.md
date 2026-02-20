@@ -461,3 +461,17 @@ I would like to pick up charms as well as runes now. I have added @templates/wor
 ## 
 
 Process all the new word images in @samples/Words/ to fill in missing template letters in @templates/letters/ . Once done I think we'll have all the lowercase letters but q, which will unlock the big OCR step\!
+
+## 
+
+Read @OCR_plan.md and do what it asks
+
+## 2026-02-20 17:11:01 UTC
+
+Fetch https://github.com/eqmvii/python-bot-test and look at the OCR/item-reading code. I need to understand:
+1. How they did letter matching / template-based OCR
+2. How they used Levenshtein distance with a known item list to correct fuzzy OCR results
+3. The overall flow from screenshot → detected item names
+4. Any specific D2 item list they used
+
+Return a concise summary of the key code patterns and the approach used.
